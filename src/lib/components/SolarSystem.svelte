@@ -6,15 +6,18 @@
 	import { colors } from '$lib/helpers';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
+	import { companies, rotationEnabled, rootX, ringSize, rootSize, companySize } from '../../store';
+	import { writable } from 'svelte/store';
 
-	const hx = tweened(window.innerWidth / 2, {
+	let companyNodes = writable<CompanyNodeData[]>([]);
+	let previousNodeCount = writable<number>(0);
+	let numberOfRings = writable<number>(0);
+
+	const rootY = tweened(window.innerHeight / 2, {
 		duration: 2500,
 		easing: cubicOut
 	});
 
-	export let companies: Company[] = [];
-
-	const distance = 200;
 	function getRingNumber(index: number): number {
 		if (index < 3) return 1;
 		if (index < 10) return 2;
@@ -23,7 +26,7 @@
 
 	function getRingDistance(index: number): number {
 		const ringNumber = getRingNumber(index);
-		return ringNumber * distance;
+		return ringNumber * $ringSize;
 	}
 
 	function getAngle(index: number, total: number): number {
@@ -38,66 +41,86 @@
 			return ((Math.PI * 2) / min) * (index + 1);
 		}
 
-		const min = total - 10 < 10 ? total - 10 : total;
+		const min = total - 10;
 		return ((Math.PI * 2) / min) * (index + 1);
 	}
 
 	function getRingSpeed(index: number): number {
+		if (!$rotationEnabled) {
+			return 0;
+		}
 		const ringNumber = getRingNumber(index);
 		return ringNumber * 0.001;
 	}
 
-	let rootX = window.innerWidth / 2;
-	let rootY = window.innerHeight / 2;
-
-	let companyNodes: CompanyNodeData[] =
-		companies.length === 0
-			? []
-			: companies.map((company, index): CompanyNodeData => {
-					const angle = getAngle(index, companies.length);
-					const color = colors[Math.floor(Math.random() * colors.length)];
-					return {
-						nodeId: `c${company.id}`,
-						angle: angle,
-						x: $hx + Math.cos(angle) * getRingDistance(index),
-						y: rootY + Math.sin(angle) * getRingDistance(index),
-						color: color,
-						company: company
-					};
-				});
-
-	function generateData() {}
-
-	let numberOfRings = companies.length <= 3 ? 1 : companies.length <= 10 ? 2 : 3;
+	function generateData() {
+		$companyNodes = $companies.map((company, index): CompanyNodeData => {
+			const angle = getAngle(index, $companies.length);
+			const color = colors[Math.floor(Math.random() * colors.length)];
+			return {
+				nodeId: `c${company.id}`,
+				angle: angle,
+				x: $rootX + Math.cos(angle) * getRingDistance(index),
+				y: $rootY + Math.sin(angle) * getRingDistance(index),
+				color: color,
+				company: company
+			};
+		});
+	}
 
 	onMount(() => {
+		$rootX = window.innerWidth / 2;
 		generateData();
-		const updateData = () => {
-			companyNodes = companyNodes.map((companyNode, index) => {
-				let newAngle = (companyNode.angle += getRingSpeed(index));
-				companyNode.angle = newAngle;
-				companyNode.x = $hx + Math.cos(newAngle) * getRingDistance(index);
-				companyNode.y = rootY + Math.sin(newAngle) * getRingDistance(index);
 
-				return companyNode;
+		const updateData = () => {
+			$companyNodes = $companies.map((company, index) => {
+				const existingNodes: CompanyNodeData[] = $companyNodes.filter(
+					(c) => c.company.id === company.id
+				);
+
+				const previousAngle: number = existingNodes.length > 0 ? existingNodes[0].angle : 0;
+				const color: number =
+					existingNodes.length > 0
+						? existingNodes[0].color
+						: colors[Math.floor(Math.random() * colors.length)];
+
+				const baseAngle = getAngle(index, $companies.length);
+				let newAngle = 0;
+
+				if ($previousNodeCount !== $companies.length) {
+					newAngle = baseAngle;
+				} else {
+					newAngle = (existingNodes.length === 0 ? baseAngle : previousAngle) + getRingSpeed(index);
+				}
+
+				return {
+					nodeId: `c${company.id}`,
+					angle: newAngle,
+					x: $rootX + Math.cos(newAngle) * getRingDistance(index),
+					y: $rootY + Math.sin(newAngle) * getRingDistance(index),
+					color: color,
+					company: company
+				};
 			});
+
+			$previousNodeCount = $companyNodes.length;
+			$numberOfRings = $companies.length <= 3 ? 1 : $companies.length <= 10 ? 2 : 3;
+
 			requestAnimationFrame(updateData);
 		};
+
 		updateData();
 	});
-
-	setTimeout(() => {
-		$hx = 0;
-	}, 5000);
 </script>
 
-<RootNode x={$hx} y={rootY} color={0xfccd85} size={60} {numberOfRings} />
+<RootNode x={$rootX} y={$rootY} color={0xfccd85} size={$rootSize} numberOfRings={$numberOfRings} />
 
-{#each companyNodes as companyNode, index (companyNode.nodeId)}
+{#each $companyNodes as companyNode, index (companyNode.nodeId)}
 	<CompanyNode
 		x={companyNode.x}
 		y={companyNode.y}
 		company={companyNode.company}
 		color={companyNode.color}
+		size={$companySize}
 	/>
 {/each}

@@ -1,12 +1,22 @@
 <script lang="ts">
-	import { Graphics } from 'svelte-pixi';
+	import { Graphics, Text } from 'svelte-pixi';
+	import { companies, rotationEnabled, rootX, rootSize, ringSize, companySize } from '../../store';
+	import { companySizeLarge, ringSizeLarge, rootSizeLarge } from '../../constants';
 
 	export let x: number = 0;
 	export let y: number = 0;
-	export let size: number = 20;
+	export let size: number = 30;
 	export let color: number;
-	export let numberOfRings = 0;
 	export let company: Company;
+
+	function onCompanyClicked() {
+		$companies = $companies.filter((c) => c.id === company.id);
+		$rotationEnabled = false;
+		$rootX = 0;
+		$rootSize = rootSizeLarge;
+		$ringSize = ringSizeLarge;
+		$companySize = companySizeLarge;
+	}
 </script>
 
 <Graphics
@@ -18,17 +28,19 @@
 		graphics.drawCircle(0, 0, size);
 		graphics.endFill();
 	}}
+	interactive
+	cursor="pointer"
+	on:click={onCompanyClicked}
 ></Graphics>
-
-<!-- {#each Array(numberOfRings) as _, index (index)}
-	<Graphics
-		{x}
-		{y}
-		draw={(graphics) => {
-			graphics.clear();
-			graphics.lineStyle(2, 0x343434);
-			graphics.drawCircle(0, 0, 200 * (index + 1));
-			graphics.endFill();
-		}}
-	/>
-{/each} -->
+<Text
+	{x}
+	{y}
+	anchor={0.5}
+	text={company.name}
+	style={{
+		fill: 'white',
+		fontSize: '20px'
+	}}
+	on:click={onCompanyClicked}
+	cursor="pointer"
+/>
