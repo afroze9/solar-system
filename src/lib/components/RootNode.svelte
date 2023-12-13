@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { companyNames } from '$lib/helpers';
+	import { companyNames, projectNames } from '$lib/helpers';
 	import { Graphics } from 'svelte-pixi';
 	import { companies, rotationEnabled, rootX, rootSize, ringSize, companySize } from '../../store';
 	import { companySizeRegular, ringSizeRegular, rootSizeRegular } from '../../constants';
@@ -9,25 +9,7 @@
 	export let size: number = 40;
 	export let color: number = 0xffffff;
 	export let numberOfRings = 0;
-
-	function rootNodeClicked() {
-		let ids = $companies.map((c) => c.id);
-		let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
-		let newName = companyNames[newId % companyNames.length];
-		let newCompany: Company = {
-			id: newId,
-			name: newName,
-			projects: []
-		};
-
-		$companies.push(newCompany);
-
-		$rotationEnabled = true;
-		$rootX = window.innerWidth / 2;
-		$rootSize = rootSizeRegular;
-		$ringSize = ringSizeRegular;
-		$companySize = companySizeRegular;
-	}
+	export let onRootNodeClicked: () => void;
 </script>
 
 <Graphics
@@ -41,7 +23,7 @@
 	}}
 	interactive
 	cursor="pointer"
-	on:click={rootNodeClicked}
+	on:click={onRootNodeClicked}
 ></Graphics>
 
 {#each Array(numberOfRings) as _, index (index)}

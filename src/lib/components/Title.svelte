@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Text } from 'svelte-pixi';
+	import { Graphics, Text } from 'svelte-pixi';
 </script>
 
 <Text

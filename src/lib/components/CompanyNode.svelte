@@ -1,22 +1,16 @@
 <script lang="ts">
 	import { Graphics, Text } from 'svelte-pixi';
-	import { companies, rotationEnabled, rootX, rootSize, ringSize, companySize } from '../../store';
-	import { companySizeLarge, ringSizeLarge, rootSizeLarge } from '../../constants';
+	import { writable } from 'svelte/store';
 
 	export let x: number = 0;
 	export let y: number = 0;
 	export let size: number = 30;
 	export let color: number;
 	export let company: Company;
+	export let onCompanyClicked: (companyId: number) => void;
 
-	function onCompanyClicked() {
-		$companies = $companies.filter((c) => c.id === company.id);
-		$rotationEnabled = false;
-		$rootX = 0;
-		$rootSize = rootSizeLarge;
-		$ringSize = ringSizeLarge;
-		$companySize = companySizeLarge;
-	}
+	let projectCount = writable<number>(company.projects.length);
+	let calculatedSize = size + 0.01 * size * $projectCount;
 </script>
 
 <Graphics
@@ -25,12 +19,12 @@
 	draw={(graphics) => {
 		graphics.clear();
 		graphics.beginFill(color || 0xffffff);
-		graphics.drawCircle(0, 0, size);
+		graphics.drawCircle(0, 0, calculatedSize);
 		graphics.endFill();
 	}}
 	interactive
 	cursor="pointer"
-	on:click={onCompanyClicked}
+	on:click={() => onCompanyClicked(company.id)}
 ></Graphics>
 <Text
 	{x}
@@ -41,6 +35,6 @@
 		fill: 'white',
 		fontSize: '20px'
 	}}
-	on:click={onCompanyClicked}
+	on:click={() => onCompanyClicked(company.id)}
 	cursor="pointer"
 />

@@ -7,5 +7,8 @@ export default defineConfig({
 	plugins: [sveltekit(), purgeCss(), isoImport()],
 	optimizeDeps: {
 		include: ['pixi.js']
+	},
+	server: {
+		port: 3000
 	}
 });

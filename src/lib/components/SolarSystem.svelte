@@ -3,20 +3,58 @@
 	import RootNode from './RootNode.svelte';
 	import CompanyNode from './CompanyNode.svelte';
 	import { onMount } from 'svelte';
-	import { colors } from '$lib/helpers';
+	import { colors, companyNames, getSampleProjects } from '$lib/helpers';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { companies, rotationEnabled, rootX, ringSize, rootSize, companySize } from '../../store';
+	import {
+		companies,
+		rotationEnabled,
+		rootX,
+		rootY,
+		ringSize,
+		rootSize,
+		companySize
+	} from '../../store';
 	import { writable } from 'svelte/store';
+	import {
+		companySizeLarge,
+		companySizeRegular,
+		ringSizeLarge,
+		ringSizeRegular,
+		rootSizeLarge,
+		rootSizeRegular
+	} from '../../constants';
 
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
 
-	const rootY = tweened(window.innerHeight / 2, {
-		duration: 2500,
-		easing: cubicOut
-	});
+	function onRootNodeClicked() {
+		let ids = $companies.map((c) => c.id);
+		let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
+		let newName = companyNames[newId % companyNames.length];
+		let newCompany: Company = {
+			id: newId,
+			name: newName,
+			projects: getSampleProjects(Math.floor(Math.random() * 20))
+		};
+		$companies.push(newCompany);
+
+		$rotationEnabled = true;
+		$rootX = window.innerWidth / 2;
+		$rootSize = rootSizeRegular;
+		$ringSize = ringSizeRegular;
+		$companySize = companySizeRegular;
+	}
+
+	function onCompanyClicked(companyId: number) {
+		$companies = $companies.filter((c) => c.id === companyId);
+		$rotationEnabled = false;
+		$rootX = 0;
+		$rootSize = rootSizeLarge;
+		$ringSize = ringSizeLarge;
+		$companySize = companySizeLarge;
+	}
 
 	function getRingNumber(index: number): number {
 		if (index < 3) return 1;
@@ -70,6 +108,7 @@
 
 	onMount(() => {
 		$rootX = window.innerWidth / 2;
+		$rootY = window.innerHeight / 2;
 		generateData();
 
 		const updateData = () => {
@@ -113,7 +152,14 @@
 	});
 </script>
 
-<RootNode x={$rootX} y={$rootY} color={0xfccd85} size={$rootSize} numberOfRings={$numberOfRings} />
+<RootNode
+	x={$rootX}
+	y={$rootY}
+	color={0xfccd85}
+	size={$rootSize}
+	numberOfRings={$numberOfRings}
+	{onRootNodeClicked}
+/>
 
 {#each $companyNodes as companyNode, index (companyNode.nodeId)}
 	<CompanyNode
@@ -122,5 +168,6 @@
 		company={companyNode.company}
 		color={companyNode.color}
 		size={$companySize}
+		{onCompanyClicked}
 	/>
 {/each}

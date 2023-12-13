@@ -21,3 +21,40 @@ export const companyNames = [
   'QuantumSphere Innovations',
   'BlazeByte Dynamics'
 ];
+
+export const projectNames = [
+  'Project QuantumQuasar',
+  'Operation StellarForge',
+  'Project NebulaNexus',
+  'Initiative TerraSynth',
+  'Project ZenithWave',
+  'Operation SolarSpectra',
+  'Project CyberPulse',
+  'Mission PinnacleVista',
+  'Project SynthoSphere',
+  'Operation EclipticHorizon',
+  'Project SynthWaveSync',
+  'Initiative StellarLink',
+  'Operation QuantumPulse',
+  'Project HyperCrest',
+  'Mission NovaSync',
+  'Project AetherRise',
+  'Initiative ApexFusion',
+  'Project QuantumSphereX',
+  'Operation BlazeByte',
+  'Project QuantumForge',
+];
+
+
+export function getSampleProjects(count: number): Project[] {
+  let projects: Project[] = [];
+  for (let i = 0; i < count; i++) {
+    projects.push({
+      id: i,
+      name: projectNames[i % projectNames.length],
+      todos: []
+    });
+  }
+
+  return projects;
+}
