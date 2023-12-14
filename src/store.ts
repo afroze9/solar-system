@@ -14,6 +14,7 @@ export const user = writable<User | undefined>({});
 
 
 export const companies = writable<Company[]>([]);
+export const selectedCompany = writable<number>(0);
 export const rotationEnabled = writable<boolean>(true);
 export const rootX = tweened(0, {
   duration: 2500,

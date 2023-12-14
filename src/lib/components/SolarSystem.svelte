@@ -11,7 +11,8 @@
 		rootY,
 		ringSize,
 		rootSize,
-		companySize
+		companySize,
+		selectedCompany
 	} from '../../store';
 	import { writable } from 'svelte/store';
 	import {
@@ -22,8 +23,8 @@
 		rootSizeLarge,
 		rootSizeRegular
 	} from '../../constants';
-	import CompanyModal from './CompanyModal.svelte';
 
+	let filteredCompanies: Company[] = [];
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
@@ -35,7 +36,8 @@
 		let newCompany: Company = {
 			id: newId,
 			name: data.name,
-			projects: getSampleProjects(Math.floor(Math.random() * 20))
+			projects: getSampleProjects(Math.floor(Math.random() * 20)),
+			color: colors[Math.floor(Math.random() * colors.length)]
 		};
 		$companies.push(newCompany);
 		$rotationEnabled = true;
@@ -53,32 +55,20 @@
 	};
 
 	function onRootNodeClicked() {
-		modalStore.trigger(modal);
-		// $isCompanyModalVisible = !$isCompanyModalVisible;
-		// if ($isCompanyModalVisible) {
-		// 	$companyModalXPos = (window.innerWidth * 2) / 3;
-		// } else {
-		// 	$companyModalXPos = 3000;
-		// }
-		// let ids = $companies.map((c) => c.id);
-		// let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
-		// let newName = companyNames[newId % companyNames.length];
-		// let newCompany: Company = {
-		// 	id: newId,
-		// 	name: newName,
-		// 	projects: getSampleProjects(Math.floor(Math.random() * 20))
-		// };
-		// $companies.push(newCompany);
-
-		// $rotationEnabled = true;
-		// $rootX = window.innerWidth / 2;
-		// $rootSize = rootSizeRegular;
-		// $ringSize = ringSizeRegular;
-		// $companySize = companySizeRegular;
+		if ($selectedCompany === 0) {
+			modalStore.trigger(modal);
+		} else {
+			$rotationEnabled = true;
+			$rootX = window.innerWidth / 2;
+			$rootSize = rootSizeRegular;
+			$ringSize = ringSizeRegular;
+			$companySize = companySizeRegular;
+			$selectedCompany = 0;
+		}
 	}
 
 	function onCompanyClicked(companyId: number) {
-		$companies = $companies.filter((c) => c.id === companyId);
+		$selectedCompany = companyId;
 		$rotationEnabled = false;
 		$rootX = 0;
 		$rootSize = rootSizeLarge;
@@ -122,15 +112,14 @@
 	}
 
 	function generateData() {
-		$companyNodes = $companies.map((company, index): CompanyNodeData => {
+		$companyNodes = filteredCompanies.map((company, index): CompanyNodeData => {
 			const angle = getAngle(index, $companies.length);
-			const color = colors[Math.floor(Math.random() * colors.length)];
 			return {
 				nodeId: `c${company.id}`,
 				angle: angle,
 				x: $rootX + Math.cos(angle) * getRingDistance(index),
 				y: $rootY + Math.sin(angle) * getRingDistance(index),
-				color: color,
+				color: company.color,
 				company: company
 			};
 		});
@@ -142,7 +131,7 @@
 		generateData();
 
 		const updateData = () => {
-			$companyNodes = $companies.map((company, index) => {
+			$companyNodes = filteredCompanies.map((company, index) => {
 				const existingNodes: CompanyNodeData[] = $companyNodes.filter(
 					(c) => c.company.id === company.id
 				);
@@ -153,10 +142,10 @@
 						? existingNodes[0].color
 						: colors[Math.floor(Math.random() * colors.length)];
 
-				const baseAngle = getAngle(index, $companies.length);
+				const baseAngle = getAngle(index, filteredCompanies.length);
 				let newAngle = 0;
 
-				if ($previousNodeCount !== $companies.length) {
+				if ($previousNodeCount !== filteredCompanies.length) {
 					newAngle = baseAngle;
 				} else {
 					newAngle = (existingNodes.length === 0 ? baseAngle : previousAngle) + getRingSpeed(index);
@@ -167,19 +156,21 @@
 					angle: newAngle,
 					x: $rootX + Math.cos(newAngle) * getRingDistance(index),
 					y: $rootY + Math.sin(newAngle) * getRingDistance(index),
-					color: color,
+					color: company.color,
 					company: company
 				};
 			});
 
 			$previousNodeCount = $companyNodes.length;
-			$numberOfRings = $companies.length <= 3 ? 1 : $companies.length <= 10 ? 2 : 3;
+			$numberOfRings = filteredCompanies.length <= 3 ? 1 : filteredCompanies.length <= 10 ? 2 : 3;
 
 			requestAnimationFrame(updateData);
 		};
 
 		updateData();
 	});
+	$: filteredCompanies =
+		$selectedCompany === 0 ? $companies : $companies.filter((c) => c.id === $selectedCompany);
 </script>
 
 <RootNode

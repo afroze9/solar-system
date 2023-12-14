@@ -8,6 +8,7 @@ type Star = {
 type Company = {
   id: number;
   name: string;
+  color: number;
   projects: Project[];
 }
 
