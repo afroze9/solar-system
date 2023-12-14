@@ -9,7 +9,7 @@ type Company = {
   id: number;
   name: string;
   color: number;
-  projects: Project[];
+  projectCount: number;
 }
 
 type CompanyNodeData = {

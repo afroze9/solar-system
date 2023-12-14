@@ -9,8 +9,7 @@
 	export let company: Company;
 	export let onCompanyClicked: (companyId: number) => void;
 
-	let projectCount = writable<number>(company.projects.length);
-	let calculatedSize = $companySize + 0.01 * $companySize * $projectCount;
+	let projectCount = writable<number>(company.projectCount);
 </script>
 
 <Graphics
@@ -32,8 +31,10 @@
 	anchor={0.5}
 	text={company.name}
 	style={{
-		fill: 'white',
-		fontSize: '20px'
+		fill: 'black',
+		fontSize: '20px',
+		stroke: 'white',
+		strokeThickness: 1
 	}}
 	on:click={() => onCompanyClicked(company.id)}
 	cursor="pointer"

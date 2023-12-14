@@ -32,11 +32,11 @@
 
 	function addCompany(data: CompanyModalData) {
 		let ids = $companies.map((c) => c.id);
-		let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
+		let newId = ids.length === 0 ? 1 : Math.max(...$companies.map((c) => c.id)) + 1;
 		let newCompany: Company = {
 			id: newId,
 			name: data.name,
-			projects: getSampleProjects(Math.floor(Math.random() * 20)),
+			projectCount: Math.floor(Math.random() * 20),
 			color: colors[Math.floor(Math.random() * colors.length)]
 		};
 		$companies.push(newCompany);
@@ -69,7 +69,7 @@
 	}
 
 	function onCompanyClicked(companyId: number) {
-		$selectedCompany = companyId;
+		selectedCompany.set(companyId);
 		rotationEnabled.set(false);
 		rootX.set(0);
 		rootSize.set(rootSizeLarge);
@@ -177,7 +177,6 @@
 <RootNode
 	x={$rootX}
 	y={$rootY}
-	color={0xfccd85}
 	size={$rootSize}
 	numberOfRings={$numberOfRings}
 	{onRootNodeClicked}
