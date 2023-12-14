@@ -42,7 +42,7 @@
 		<!-- prettier-ignore -->
 		<footer class="modal-footer flex justify-end space-x-2">
         <button class="btn variant-filled" on:click={onClose}>Cancel</button>
-        <button class="btn variant-filled-primary" on:click={onFormSubmit}>Submit Form</button>
+        <button class="btn variant-filled-primary" on:click={onFormSubmit}>Save</button>
     </footer>
 	</div>
 {/if}

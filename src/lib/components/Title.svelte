@@ -1,25 +1,24 @@
 <script lang="ts">
-	import { Graphics, Text } from 'svelte-pixi';
+	import { auth } from '../../auth/authService';
+	import { isLoading } from '../../store';
+
+	let { login } = auth;
 </script>
 
-<Text
-	text="Nexus PM"
-	anchor={0}
-	x={window.innerWidth / 6}
-	y={window.innerHeight / 6}
-	style={{
-		fill: 'white',
-		fontSize: '50px'
-	}}
-/>
+<div class="title">
+	<h1 class="h1">Nexus PM</h1>
+	<h3 class="h3">A simple project management app built using the Nexus Framework</h3>
+	{#if !$isLoading}
+		<button type="button" class="btn btn-xl variant-filled-primary login-btn mt-5" on:click={login}
+			>Login</button
+		>{/if}
+</div>
 
-<Text
-	text="A simple project management app built using the Nexus Framework"
-	anchor={0}
-	x={window.innerWidth / 6}
-	y={window.innerHeight / 6 + 75}
-	style={{
-		fill: 'white',
-		fontSize: '30px'
-	}}
-/>
+<style>
+	.title {
+		position: fixed;
+		z-index: 10;
+		left: 10vw;
+		top: 10vh;
+	}
+</style>

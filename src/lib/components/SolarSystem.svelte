@@ -2,7 +2,7 @@
 	import RootNode from './RootNode.svelte';
 	import CompanyNode from './CompanyNode.svelte';
 	import { onMount } from 'svelte';
-	import { colors } from '$lib/helpers';
+	import { colors, getSampleProjects } from '$lib/helpers';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import {
 		companies,
@@ -14,20 +14,42 @@
 		companySize
 	} from '../../store';
 	import { writable } from 'svelte/store';
-	import { companySizeLarge, ringSizeLarge, rootSizeLarge } from '../../constants';
+	import {
+		companySizeLarge,
+		companySizeRegular,
+		ringSizeLarge,
+		ringSizeRegular,
+		rootSizeLarge,
+		rootSizeRegular
+	} from '../../constants';
+	import CompanyModal from './CompanyModal.svelte';
 
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
 	const modalStore = getModalStore();
 
+	function addCompany(data: CompanyModalData) {
+		let ids = $companies.map((c) => c.id);
+		let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
+		let newCompany: Company = {
+			id: newId,
+			name: data.name,
+			projects: getSampleProjects(Math.floor(Math.random() * 20))
+		};
+		$companies.push(newCompany);
+		$rotationEnabled = true;
+		$rootX = window.innerWidth / 2;
+		$rootSize = rootSizeRegular;
+		$ringSize = ringSizeRegular;
+		$companySize = companySizeRegular;
+	}
+
 	const modal: ModalSettings = {
 		type: 'component',
 		component: 'companyModal',
 		title: 'Add Company',
-		response: (data: CompanyModalData) => {
-			console.log(data);
-		}
+		response: addCompany
 	};
 
 	function onRootNodeClicked() {
