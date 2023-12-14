@@ -1,4 +1,4 @@
-export const ringSizeRegular: number = 150;
+export const ringSizeRegular: number = 175;
 export const ringSizeLarge: number = 500;
 
 export const companySizeRegular: number = 40;

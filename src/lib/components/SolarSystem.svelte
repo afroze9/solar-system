@@ -40,11 +40,12 @@
 			color: colors[Math.floor(Math.random() * colors.length)]
 		};
 		$companies.push(newCompany);
-		$rotationEnabled = true;
-		$rootX = window.innerWidth / 2;
-		$rootSize = rootSizeRegular;
-		$ringSize = ringSizeRegular;
-		$companySize = companySizeRegular;
+		rootX.set(window.innerWidth / 2);
+		rotationEnabled.set(true);
+
+		rootSize.set(rootSizeRegular);
+		ringSize.set(ringSizeRegular);
+		companySize.set(companySizeRegular);
 	}
 
 	const modal: ModalSettings = {
@@ -58,22 +59,22 @@
 		if ($selectedCompany === 0) {
 			modalStore.trigger(modal);
 		} else {
-			$rotationEnabled = true;
-			$rootX = window.innerWidth / 2;
-			$rootSize = rootSizeRegular;
-			$ringSize = ringSizeRegular;
-			$companySize = companySizeRegular;
 			$selectedCompany = 0;
+			rotationEnabled.set(true);
+			rootX.set(window.innerWidth / 2);
+			rootSize.set(rootSizeRegular);
+			ringSize.set(ringSizeRegular);
+			companySize.set(companySizeRegular);
 		}
 	}
 
 	function onCompanyClicked(companyId: number) {
 		$selectedCompany = companyId;
-		$rotationEnabled = false;
-		$rootX = 0;
-		$rootSize = rootSizeLarge;
-		$ringSize = ringSizeLarge;
-		$companySize = companySizeLarge;
+		rotationEnabled.set(false);
+		rootX.set(0);
+		rootSize.set(rootSizeLarge);
+		ringSize.set(ringSizeLarge);
+		companySize.set(companySizeLarge);
 	}
 
 	function getRingNumber(index: number): number {
@@ -188,7 +189,6 @@
 		y={companyNode.y}
 		company={companyNode.company}
 		color={companyNode.color}
-		size={$companySize}
 		{onCompanyClicked}
 	/>
 {/each}

@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Graphics, Text } from 'svelte-pixi';
 	import { writable } from 'svelte/store';
+	import { companySize } from '../../store';
 
 	export let x: number = 0;
 	export let y: number = 0;
-	export let size: number = 30;
 	export let color: number;
 	export let company: Company;
 	export let onCompanyClicked: (companyId: number) => void;
 
 	let projectCount = writable<number>(company.projects.length);
-	let calculatedSize = size + 0.01 * size * $projectCount;
+	let calculatedSize = $companySize + 0.01 * $companySize * $projectCount;
 </script>
 
 <Graphics
@@ -19,7 +19,7 @@
 	draw={(graphics) => {
 		graphics.clear();
 		graphics.beginFill(color || 0xffffff);
-		graphics.drawCircle(0, 0, calculatedSize);
+		graphics.drawCircle(0, 0, $companySize + 0.05 * $companySize * $projectCount);
 		graphics.endFill();
 	}}
 	interactive
