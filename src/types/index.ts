@@ -32,3 +32,8 @@ type Todo = {
   description: string;
   isComplete: boolean;
 }
+
+type CompanyModalData = {
+  id?: number;
+  name: string;
+}

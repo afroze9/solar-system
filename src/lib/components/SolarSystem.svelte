@@ -1,11 +1,9 @@
 <script lang="ts">
-	import { Graphics, onTick } from 'svelte-pixi';
 	import RootNode from './RootNode.svelte';
 	import CompanyNode from './CompanyNode.svelte';
 	import { onMount } from 'svelte';
-	import { colors, companyNames, getSampleProjects } from '$lib/helpers';
-	import { tweened } from 'svelte/motion';
-	import { cubicOut } from 'svelte/easing';
+	import { colors } from '$lib/helpers';
+	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import {
 		companies,
 		rotationEnabled,
@@ -13,31 +11,33 @@
 		rootY,
 		ringSize,
 		rootSize,
-		companySize,
-		isCompanyModalVisible,
-		companyModalXPos
+		companySize
 	} from '../../store';
 	import { writable } from 'svelte/store';
-	import {
-		companySizeLarge,
-		companySizeRegular,
-		ringSizeLarge,
-		ringSizeRegular,
-		rootSizeLarge,
-		rootSizeRegular
-	} from '../../constants';
+	import { companySizeLarge, ringSizeLarge, rootSizeLarge } from '../../constants';
 
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
+	const modalStore = getModalStore();
+
+	const modal: ModalSettings = {
+		type: 'component',
+		component: 'companyModal',
+		title: 'Add Company',
+		response: (data: CompanyModalData) => {
+			console.log(data);
+		}
+	};
 
 	function onRootNodeClicked() {
-		$isCompanyModalVisible = !$isCompanyModalVisible;
-		if ($isCompanyModalVisible) {
-			$companyModalXPos = (window.innerWidth * 2) / 3;
-		} else {
-			$companyModalXPos = 3000;
-		}
+		modalStore.trigger(modal);
+		// $isCompanyModalVisible = !$isCompanyModalVisible;
+		// if ($isCompanyModalVisible) {
+		// 	$companyModalXPos = (window.innerWidth * 2) / 3;
+		// } else {
+		// 	$companyModalXPos = 3000;
+		// }
 		// let ids = $companies.map((c) => c.id);
 		// let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
 		// let newName = companyNames[newId % companyNames.length];

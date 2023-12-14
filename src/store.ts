@@ -38,11 +38,3 @@ export const companySize = tweened(companySizeRegular, {
   duration: 2500,
   easing: cubicOut
 })
-
-
-// Add company
-export const isCompanyModalVisible = writable<boolean>(false)
-export const companyModalXPos = tweened(isCompanyModalVisible ? 3000 : 20, {
-  duration: 500,
-  easing: cubicOut
-});

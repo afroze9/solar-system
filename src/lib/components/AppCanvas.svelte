@@ -6,7 +6,6 @@
 	import { isAuthenticated, isLoading } from '../../store';
 	import LoginButton from './LoginButton.svelte';
 	import LogoutButton from './LogoutButton.svelte';
-	import CompanyModal from './CompanyModal.svelte';
 </script>
 
 <Application resizeTo={window} antialias={true}>
@@ -20,6 +19,5 @@
 	{#if $isAuthenticated}
 		<SolarSystem />
 		<LogoutButton />
-		<CompanyModal />
 	{/if}
 </Application>
