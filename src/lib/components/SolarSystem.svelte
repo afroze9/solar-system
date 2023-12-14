@@ -13,7 +13,9 @@
 		rootY,
 		ringSize,
 		rootSize,
-		companySize
+		companySize,
+		isCompanyModalVisible,
+		companyModalXPos
 	} from '../../store';
 	import { writable } from 'svelte/store';
 	import {
@@ -30,21 +32,27 @@
 	let numberOfRings = writable<number>(0);
 
 	function onRootNodeClicked() {
-		let ids = $companies.map((c) => c.id);
-		let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
-		let newName = companyNames[newId % companyNames.length];
-		let newCompany: Company = {
-			id: newId,
-			name: newName,
-			projects: getSampleProjects(Math.floor(Math.random() * 20))
-		};
-		$companies.push(newCompany);
+		$isCompanyModalVisible = !$isCompanyModalVisible;
+		if ($isCompanyModalVisible) {
+			$companyModalXPos = (window.innerWidth * 2) / 3;
+		} else {
+			$companyModalXPos = 3000;
+		}
+		// let ids = $companies.map((c) => c.id);
+		// let newId = ids.length === 0 ? 0 : Math.max(...$companies.map((c) => c.id)) + 1;
+		// let newName = companyNames[newId % companyNames.length];
+		// let newCompany: Company = {
+		// 	id: newId,
+		// 	name: newName,
+		// 	projects: getSampleProjects(Math.floor(Math.random() * 20))
+		// };
+		// $companies.push(newCompany);
 
-		$rotationEnabled = true;
-		$rootX = window.innerWidth / 2;
-		$rootSize = rootSizeRegular;
-		$ringSize = ringSizeRegular;
-		$companySize = companySizeRegular;
+		// $rotationEnabled = true;
+		// $rootX = window.innerWidth / 2;
+		// $rootSize = rootSizeRegular;
+		// $ringSize = ringSizeRegular;
+		// $companySize = companySizeRegular;
 	}
 
 	function onCompanyClicked(companyId: number) {
