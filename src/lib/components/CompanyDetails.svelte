@@ -55,6 +55,16 @@
 		scrollAngle.set(oldAngle - 0.15);
 	}
 
+	function addProject() {
+		let newProject: Project = {
+			id: Math.max(...$projects.map((p) => p.id)) + 1,
+			color: 0xff0fff,
+			name: 'New Proj',
+			todoCount: 10
+		};
+		$projects.push(newProject);
+	}
+
 	onMount(() => {
 		generateData();
 		const updateData = () => {
@@ -83,10 +93,6 @@
 	$: $scrollUpEnabled = $firstProjectInView > 0;
 </script>
 
-<!-- Project List -->
-<!-- Project Row (circle + text) e.g. () Project Name -->
-<!-- Scrolls -->
-
 {#if $selectedCompany !== 0}
 	<button
 		type="button"
@@ -100,6 +106,16 @@
 		disabled={!$scrollDownEnabled}
 		on:click={scrollDown}>v</button
 	>
+
+	<button
+		type="button"
+		class="btn variant-filled add-project-btn"
+		disabled={!$scrollDownEnabled}
+		on:click={addProject}
+	>
+		<i class="fa-solid fa-plus" />
+		<span>Add Project</span>
+	</button>
 {/if}
 
 {#if $selectedCompany !== 0 && $projectNodes.length > 0}
@@ -121,5 +137,12 @@
 		z-index: 10;
 		bottom: 10px;
 		left: 50%;
+	}
+
+	.add-project-btn {
+		position: absolute;
+		z-index: 10;
+		bottom: 10px;
+		left: 25%;
 	}
 </style>

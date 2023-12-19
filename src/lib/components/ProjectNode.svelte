@@ -8,7 +8,6 @@
 	export let y: number;
 	export let project: Project;
 	// export let onCompanyClicked: (companyId: number) => void;
-	console.log(project);
 </script>
 
 <Graphics
