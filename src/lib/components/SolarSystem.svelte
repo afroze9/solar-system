@@ -59,18 +59,18 @@
 		response: addCompany
 	};
 
-	function onRootNodeClicked() {
-		if ($selectedCompany === 0) {
-			modalStore.trigger(modal);
-		} else {
-			$selectedCompany = 0;
-			rotationEnabled.set(true);
-			rootX.set(window.innerWidth / 2);
-			rootSize.set(rootSizeRegular);
-			ringSize.set(ringSizeRegular);
-			companySize.set(companySizeRegular);
-			showSecondaryRing.set(false);
-		}
+	function onBackButtonClicked() {
+		$selectedCompany = 0;
+		rotationEnabled.set(true);
+		rootX.set(window.innerWidth / 2);
+		rootSize.set(rootSizeRegular);
+		ringSize.set(ringSizeRegular);
+		companySize.set(companySizeRegular);
+		showSecondaryRing.set(false);
+		// if ($selectedCompany === 0) {
+		// 	modalStore.trigger(modal);
+		// } else {
+		// }
 	}
 
 	function onCompanyClicked(companyId: number) {
@@ -181,7 +181,6 @@
 	size={$rootSize}
 	numberOfRings={$numberOfRings}
 	showSecondaryRing={$showSecondaryRing}
-	{onRootNodeClicked}
 />
 
 {#each $companyNodes as companyNode, index (companyNode.nodeId)}
@@ -196,4 +195,35 @@
 
 {#if $selectedCompany !== 0}
 	<CompanyDetails />
+	<button type="button" class="btn variant-filled back-btn" on:click={onBackButtonClicked}>
+		<i class="fa-solid fa-arrow-left" />
+		<span>Back</span>
+	</button>
 {/if}
+
+{#if $selectedCompany === 0}
+	<button
+		type="button"
+		class="btn variant-filled add-company-btn"
+		on:click={() => modalStore.trigger(modal)}
+	>
+		<i class="fa-solid fa-plus" />
+		<span>Add Company</span>
+	</button>
+{/if}
+
+<style>
+	.back-btn {
+		position: absolute;
+		z-index: 10;
+		top: 10px;
+		left: 10px;
+	}
+
+	.add-company-btn {
+		position: absolute;
+		z-index: 10;
+		top: 10px;
+		left: 125px;
+	}
+</style>

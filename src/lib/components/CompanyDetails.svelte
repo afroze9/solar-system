@@ -175,7 +175,7 @@
 	.add-project-btn {
 		position: absolute;
 		z-index: 10;
-		bottom: 10px;
-		left: 25%;
+		top: 10px;
+		left: 125px;
 	}
 </style>

@@ -7,7 +7,6 @@
 	export let y: number = 0;
 	export let size: number = 40;
 	export let numberOfRings = 0;
-	export let onRootNodeClicked: () => void;
 	export let showSecondaryRing: boolean = false;
 
 	let color = writable<number>(0xfccd85);
@@ -22,17 +21,6 @@
 		graphics.beginFill($color);
 		graphics.drawCircle(0, 0, size);
 		graphics.endFill();
-	}}
-	interactive
-	cursor="pointer"
-	on:click={onRootNodeClicked}
-	on:pointerover={() => {
-		color.set(0xc9a36a);
-		isHovered.set(true);
-	}}
-	on:pointerout={() => {
-		color.set(0xfccd85);
-		isHovered.set(false);
 	}}
 ></Graphics>
 
@@ -60,12 +48,4 @@
 			graphics.endFill();
 		}}
 	/>
-{/if}
-
-{#if $isHovered}
-	{#if $selectedCompany === 0}
-		<Text text={'+'} {x} {y} anchor={0.5} style={{ fill: 'black', fontSize: '50px' }} />
-	{:else}
-		<Text text={'<<'} x={x + 50} {y} anchor={0.5} style={{ fill: 'black', fontSize: '50px' }} />
-	{/if}
 {/if}
