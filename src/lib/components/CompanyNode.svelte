@@ -31,10 +31,8 @@
 	anchor={0.5}
 	text={company.name}
 	style={{
-		fill: 'black',
-		fontSize: '20px',
-		stroke: 'white',
-		strokeThickness: 1
+		fill: 'white',
+		fontSize: '20px'
 	}}
 	on:click={() => onCompanyClicked(company.id)}
 	cursor="pointer"

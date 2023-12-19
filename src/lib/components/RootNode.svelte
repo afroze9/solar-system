@@ -8,6 +8,7 @@
 	export let size: number = 40;
 	export let numberOfRings = 0;
 	export let showSecondaryRing: boolean = false;
+	export let showTertiaryRing: boolean = false;
 
 	let color = writable<number>(0xfccd85);
 	let isHovered = writable<boolean>(false);
@@ -45,6 +46,19 @@
 			graphics.clear();
 			graphics.lineStyle(2, 0x343434);
 			graphics.drawCircle(0, 0, $ringSize * 1.5);
+			graphics.endFill();
+		}}
+	/>
+{/if}
+
+{#if showTertiaryRing}
+	<Graphics
+		{x}
+		{y}
+		draw={(graphics) => {
+			graphics.clear();
+			graphics.lineStyle(2, 0x343434);
+			graphics.drawCircle(0, 0, $ringSize * 2.25);
 			graphics.endFill();
 		}}
 	/>

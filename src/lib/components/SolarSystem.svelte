@@ -2,7 +2,7 @@
 	import RootNode from './RootNode.svelte';
 	import CompanyNode from './CompanyNode.svelte';
 	import { onMount } from 'svelte';
-	import { colors, getSampleProjects } from '$lib/helpers';
+	import { colors } from '$lib/helpers';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import {
 		companies,
@@ -12,7 +12,10 @@
 		ringSize,
 		rootSize,
 		companySize,
-		selectedCompany
+		selectedCompany,
+		showSecondaryRing,
+		showTertiaryRing,
+		selectedProject
 	} from '../../store';
 	import { writable } from 'svelte/store';
 	import {
@@ -24,13 +27,11 @@
 		rootSizeRegular
 	} from '../../constants';
 	import CompanyDetails from './CompanyDetails.svelte';
-	import { Graphics } from 'svelte-pixi';
 
 	let filteredCompanies: Company[] = [];
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
-	let showSecondaryRing = writable<boolean>(false);
 
 	const modalStore = getModalStore();
 
@@ -67,10 +68,6 @@
 		ringSize.set(ringSizeRegular);
 		companySize.set(companySizeRegular);
 		showSecondaryRing.set(false);
-		// if ($selectedCompany === 0) {
-		// 	modalStore.trigger(modal);
-		// } else {
-		// }
 	}
 
 	function onCompanyClicked(companyId: number) {
@@ -181,6 +178,7 @@
 	size={$rootSize}
 	numberOfRings={$numberOfRings}
 	showSecondaryRing={$showSecondaryRing}
+	showTertiaryRing={$showTertiaryRing}
 />
 
 {#each $companyNodes as companyNode, index (companyNode.nodeId)}
@@ -195,10 +193,12 @@
 
 {#if $selectedCompany !== 0}
 	<CompanyDetails />
-	<button type="button" class="btn variant-filled back-btn" on:click={onBackButtonClicked}>
-		<i class="fa-solid fa-arrow-left" />
-		<span>Back</span>
-	</button>
+	{#if $selectedProject === 0}
+		<button type="button" class="btn variant-filled back-btn" on:click={onBackButtonClicked}>
+			<i class="fa-solid fa-arrow-left" />
+			<span>Back to Companies</span>
+		</button>
+	{/if}
 {/if}
 
 {#if $selectedCompany === 0}
@@ -224,6 +224,6 @@
 		position: absolute;
 		z-index: 10;
 		top: 10px;
-		left: 125px;
+		left: 225px;
 	}
 </style>

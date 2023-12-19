@@ -30,7 +30,7 @@ type ProjectNodeData = {
   project: Project;
 }
 
-type NodeData<T extends Company | Project> = {
+type NodeData<T extends Company | Project | Todo> = {
   nodeId: string;
   x: number;
   y: number;
@@ -51,6 +51,7 @@ type Todo = {
   name: string;
   description: string;
   isComplete: boolean;
+  color: number;
 }
 
 type CompanyModalData = {

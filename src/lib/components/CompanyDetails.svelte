@@ -1,13 +1,20 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
-	import { rootX, rootY, selectedCompany, selectedProject } from '../../store';
+	import {
+		rootX,
+		rootY,
+		selectedCompany,
+		selectedProject,
+		selectedTodo,
+		showTertiaryRing
+	} from '../../store';
 	import { colors, getSampleProjects } from '$lib/helpers';
 	import ProjectNode from './ProjectNode.svelte';
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
-	import ProjectModal from './ProjectModal.svelte';
+	import ProjectDetails from './ProjectDetails.svelte';
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -19,7 +26,7 @@
 		easing: cubicOut
 	});
 
-	function getAngle(index: number, total: number): number {
+	function getAngle(index: number): number {
 		return -0.3 + $scrollAngle + index * 0.1;
 	}
 
@@ -28,7 +35,7 @@
 		projects.set(sampleProjects);
 
 		const mappedNodes = filteredProjects.map((project, index): NodeData<Project> => {
-			const angle = getAngle(index, $projects.length);
+			const angle = getAngle(index);
 			const mappedNode = {
 				nodeId: `p${project.id}`,
 				angle: angle,
@@ -105,11 +112,23 @@
 		modalStore.trigger(modal);
 	}
 
+	function onProjectClicked(projectId: number) {
+		console.log('onProjectClicked', projectId);
+		selectedProject.set(projectId);
+		console.log('onProjectClicked', $selectedProject);
+		showTertiaryRing.set(true);
+	}
+
+	function onBackButtonClicked() {
+		selectedProject.set(0);
+		showTertiaryRing.set(false);
+	}
+
 	onMount(() => {
 		generateData();
 		const updateData = () => {
 			const mappedNodes = filteredProjects.map((project, index): NodeData<Project> => {
-				const baseAngle = getAngle(index, $projects.length);
+				const baseAngle = getAngle(index);
 				const mappedNode = {
 					nodeId: `p${project.id}`,
 					angle: baseAngle,
@@ -132,28 +151,42 @@
 </script>
 
 {#if $selectedCompany !== 0}
-	<button
-		type="button"
-		class="btn variant-filled scroll-up-btn"
-		on:pointerover={startScrollUp}
-		on:pointerleave={stopScrollUp}>^</button
-	>
-	<button
-		type="button"
-		class="btn variant-filled scroll-down-btn"
-		on:pointerover={startScrollDown}
-		on:pointerleave={stopScrollDown}>v</button
-	>
+	{#if $selectedProject === 0}
+		<button
+			type="button"
+			class="btn variant-filled scroll-up-btn"
+			on:pointerover={startScrollUp}
+			on:pointerleave={stopScrollUp}>^</button
+		>
+		<button
+			type="button"
+			class="btn variant-filled scroll-down-btn"
+			on:pointerover={startScrollDown}
+			on:pointerleave={stopScrollDown}>v</button
+		>
+		<button type="button" class="btn variant-filled add-project-btn" on:click={onAddProjectClicked}>
+			<i class="fa-solid fa-plus" />
+			<span>Add Project</span>
+		</button>
+	{/if}
+{/if}
 
-	<button type="button" class="btn variant-filled add-project-btn" on:click={onAddProjectClicked}>
-		<i class="fa-solid fa-plus" />
-		<span>Add Project</span>
+{#if $selectedProject !== 0}
+	<button type="button" class="btn variant-filled back-btn" on:click={onBackButtonClicked}>
+		<i class="fa-solid fa-arrow-left" />
+		<span>Back to Projects</span>
 	</button>
+	<ProjectDetails />
 {/if}
 
 {#if $selectedCompany !== 0 && $projectNodes.length > 0}
 	{#each $projectNodes as projectNode, index (projectNode.nodeId)}
-		<ProjectNode x={projectNode.x} y={projectNode.y} project={projectNode.data} />
+		<ProjectNode
+			x={projectNode.x}
+			y={projectNode.y}
+			project={projectNode.data}
+			{onProjectClicked}
+		/>
 	{/each}
 {/if}
 
@@ -176,6 +209,13 @@
 		position: absolute;
 		z-index: 10;
 		top: 10px;
-		left: 125px;
+		left: 225px;
+	}
+
+	.back-btn {
+		position: absolute;
+		z-index: 10;
+		top: 10px;
+		left: 10px;
 	}
 </style>
