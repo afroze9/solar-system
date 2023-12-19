@@ -4,17 +4,14 @@
 	import { getSampleProjects } from '$lib/helpers';
 	import ProjectNode from './ProjectNode.svelte';
 	import { onMount } from 'svelte';
-	import { Text } from 'svelte-pixi';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 
-	const listSize = 7;
+	let scrollDownIntervalId: NodeJS.Timeout | null;
+	let scrollUpIntervalId: NodeJS.Timeout | null;
 	let projects = writable<Project[]>([]);
 	let filteredProjects: Project[] = [];
 	let projectNodes = writable<NodeData<Project>[]>([]);
-	let scrollUpEnabled = writable<boolean>(false);
-	let scrollDownEnabled = writable<boolean>(false);
-	let firstProjectInView = writable<number>(0);
 	let scrollAngle = tweened(0, {
 		duration: 750,
 		easing: cubicOut
@@ -44,15 +41,43 @@
 	}
 
 	function scrollUp() {
-		$firstProjectInView--;
 		let oldAngle = $scrollAngle;
 		scrollAngle.set(oldAngle + 0.15);
 	}
 
 	function scrollDown() {
-		$firstProjectInView++;
 		let oldAngle = $scrollAngle;
 		scrollAngle.set(oldAngle - 0.15);
+	}
+
+	function startScrollDown() {
+		if (scrollDownIntervalId) {
+			clearInterval(scrollDownIntervalId);
+		}
+
+		scrollDownIntervalId = setInterval(scrollDown, 100);
+	}
+
+	function stopScrollDown() {
+		if (scrollDownIntervalId) {
+			clearInterval(scrollDownIntervalId);
+			scrollDownIntervalId = null;
+		}
+	}
+
+	function startScrollUp() {
+		if (scrollUpIntervalId) {
+			clearInterval(scrollUpIntervalId);
+		}
+
+		scrollUpIntervalId = setInterval(scrollUp, 100);
+	}
+
+	function stopScrollUp() {
+		if (scrollUpIntervalId) {
+			clearInterval(scrollUpIntervalId);
+			scrollUpIntervalId = null;
+		}
 	}
 
 	function addProject() {
@@ -89,30 +114,23 @@
 
 	$: filteredProjects =
 		$selectedProject === 0 ? $projects : $projects.filter((p) => p.id === $selectedProject);
-	$: $scrollDownEnabled = $firstProjectInView + filteredProjects.length >= listSize;
-	$: $scrollUpEnabled = $firstProjectInView > 0;
 </script>
 
 {#if $selectedCompany !== 0}
 	<button
 		type="button"
 		class="btn variant-filled scroll-up-btn"
-		disabled={!$scrollUpEnabled}
-		on:click={scrollUp}>^</button
+		on:pointerover={startScrollUp}
+		on:pointerleave={stopScrollUp}>^</button
 	>
 	<button
 		type="button"
 		class="btn variant-filled scroll-down-btn"
-		disabled={!$scrollDownEnabled}
-		on:click={scrollDown}>v</button
+		on:pointerover={startScrollDown}
+		on:pointerleave={stopScrollDown}>v</button
 	>
 
-	<button
-		type="button"
-		class="btn variant-filled add-project-btn"
-		disabled={!$scrollDownEnabled}
-		on:click={addProject}
-	>
+	<button type="button" class="btn variant-filled add-project-btn" on:click={addProject}>
 		<i class="fa-solid fa-plus" />
 		<span>Add Project</span>
 	</button>
