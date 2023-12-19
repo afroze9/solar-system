@@ -49,12 +49,16 @@ export const projectNames = [
 export function getSampleProjects(count: number): Project[] {
   let projects: Project[] = [];
   for (let i = 0; i < count; i++) {
+    let colorIndex = Math.floor(Math.random() * colors.length);
+    console.log(colorIndex);
     projects.push({
       id: i,
       name: projectNames[i % projectNames.length],
-      todos: []
+      todoCount: 3,
+      color: colors[colorIndex]
     });
   }
+  console.log(projects);
 
   return projects;
 }

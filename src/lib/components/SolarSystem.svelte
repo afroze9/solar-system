@@ -23,11 +23,15 @@
 		rootSizeLarge,
 		rootSizeRegular
 	} from '../../constants';
+	import CompanyDetails from './CompanyDetails.svelte';
+	import { Graphics } from 'svelte-pixi';
 
 	let filteredCompanies: Company[] = [];
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
+	let showSecondaryRing = writable<boolean>(false);
+
 	const modalStore = getModalStore();
 
 	function addCompany(data: CompanyModalData) {
@@ -65,6 +69,7 @@
 			rootSize.set(rootSizeRegular);
 			ringSize.set(ringSizeRegular);
 			companySize.set(companySizeRegular);
+			showSecondaryRing.set(false);
 		}
 	}
 
@@ -75,6 +80,7 @@
 		rootSize.set(rootSizeLarge);
 		ringSize.set(ringSizeLarge);
 		companySize.set(companySizeLarge);
+		showSecondaryRing.set(true);
 	}
 
 	function getRingNumber(index: number): number {
@@ -138,11 +144,6 @@
 				);
 
 				const previousAngle: number = existingNodes.length > 0 ? existingNodes[0].angle : 0;
-				const color: number =
-					existingNodes.length > 0
-						? existingNodes[0].color
-						: colors[Math.floor(Math.random() * colors.length)];
-
 				const baseAngle = getAngle(index, filteredCompanies.length);
 				let newAngle = 0;
 
@@ -179,6 +180,7 @@
 	y={$rootY}
 	size={$rootSize}
 	numberOfRings={$numberOfRings}
+	showSecondaryRing={$showSecondaryRing}
 	{onRootNodeClicked}
 />
 
@@ -191,3 +193,7 @@
 		{onCompanyClicked}
 	/>
 {/each}
+
+{#if $selectedCompany !== 0}
+	<CompanyDetails />
+{/if}

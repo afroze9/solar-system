@@ -12,10 +12,6 @@
 	<button type="button" class="btn variant-filled login-btn" on:click={logout}>Logout</button>
 {/if}
 
-{#if $selectedCompany !== 0}
-	<CompanyDetails />
-{/if}
-
 <style>
 	.login-btn {
 		position: fixed;

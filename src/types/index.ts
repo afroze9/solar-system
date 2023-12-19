@@ -21,10 +21,29 @@ type CompanyNodeData = {
   company: Company;
 }
 
+type ProjectNodeData = {
+  nodeId: string;
+  x: number;
+  y: number;
+  angle: number;
+  color: number;
+  project: Project;
+}
+
+type NodeData<T extends Company | Project> = {
+  nodeId: string;
+  x: number;
+  y: number;
+  angle: number;
+  color: number;
+  data: T;
+}
+
 type Project = {
   id: number;
   name: string;
-  todos: Todo[];
+  color: number;
+  todoCount: number;
 }
 
 type Todo = {

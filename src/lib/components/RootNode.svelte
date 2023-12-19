@@ -1,16 +1,6 @@
 <script lang="ts">
-	import { companyNames, projectNames } from '$lib/helpers';
-	import { Graphics, track, Text } from 'svelte-pixi';
-	import {
-		companies,
-		rotationEnabled,
-		rootX,
-		rootSize,
-		ringSize,
-		companySize,
-		selectedCompany
-	} from '../../store';
-	import { companySizeRegular, ringSizeRegular, rootSizeRegular } from '../../constants';
+	import { Graphics, Text } from 'svelte-pixi';
+	import { ringSize, selectedCompany } from '../../store';
 	import { writable } from 'svelte/store';
 
 	export let x: number = 0;
@@ -18,6 +8,7 @@
 	export let size: number = 40;
 	export let numberOfRings = 0;
 	export let onRootNodeClicked: () => void;
+	export let showSecondaryRing: boolean = false;
 
 	let color = writable<number>(0xfccd85);
 	let isHovered = writable<boolean>(false);
@@ -57,6 +48,19 @@
 		}}
 	/>
 {/each}
+
+{#if showSecondaryRing}
+	<Graphics
+		{x}
+		{y}
+		draw={(graphics) => {
+			graphics.clear();
+			graphics.lineStyle(2, 0x343434);
+			graphics.drawCircle(0, 0, $ringSize * 1.5);
+			graphics.endFill();
+		}}
+	/>
+{/if}
 
 {#if $isHovered}
 	{#if $selectedCompany === 0}

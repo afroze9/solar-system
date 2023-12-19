@@ -39,3 +39,5 @@ export const companySize = tweened(companySizeRegular, {
   duration: 2500,
   easing: cubicOut
 })
+
+export const selectedProject = writable<number>(0);
