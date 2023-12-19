@@ -7,8 +7,10 @@
 	import { auth } from '../auth/authService';
 	import { onMount } from 'svelte';
 	import CompanyModal from '../lib/components/CompanyModal.svelte';
+	import ProjectModal from '../lib/components/ProjectModal.svelte';
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
+
 	initializeStores();
 
 	let { initClient } = auth;
@@ -19,6 +21,9 @@
 	const modalRegistry: Record<string, ModalComponent> = {
 		companyModal: {
 			ref: CompanyModal
+		},
+		projectModal: {
+			ref: ProjectModal
 		}
 	};
 </script>

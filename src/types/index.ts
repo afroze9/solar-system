@@ -57,3 +57,8 @@ type CompanyModalData = {
   id?: number;
   name: string;
 }
+
+type ProjectModalData = {
+  id?: number;
+  name: string;
+}

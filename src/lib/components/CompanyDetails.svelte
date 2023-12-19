@@ -1,11 +1,13 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import { rootX, rootY, selectedCompany, selectedProject } from '../../store';
-	import { getSampleProjects } from '$lib/helpers';
+	import { colors, getSampleProjects } from '$lib/helpers';
 	import ProjectNode from './ProjectNode.svelte';
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
+	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import ProjectModal from './ProjectModal.svelte';
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -80,14 +82,27 @@
 		}
 	}
 
-	function addProject() {
+	const modalStore = getModalStore();
+
+	const modal: ModalSettings = {
+		type: 'component',
+		component: 'projectModal',
+		title: 'Add Project',
+		response: addProject
+	};
+
+	function addProject(data: ProjectModalData) {
 		let newProject: Project = {
 			id: Math.max(...$projects.map((p) => p.id)) + 1,
-			color: 0xff0fff,
-			name: 'New Proj',
-			todoCount: 10
+			color: colors[Math.floor(Math.random() * colors.length)],
+			name: data.name,
+			todoCount: Math.floor(Math.random() * 20)
 		};
 		$projects.push(newProject);
+	}
+
+	function onAddProjectClicked() {
+		modalStore.trigger(modal);
 	}
 
 	onMount(() => {
@@ -130,7 +145,7 @@
 		on:pointerleave={stopScrollDown}>v</button
 	>
 
-	<button type="button" class="btn variant-filled add-project-btn" on:click={addProject}>
+	<button type="button" class="btn variant-filled add-project-btn" on:click={onAddProjectClicked}>
 		<i class="fa-solid fa-plus" />
 		<span>Add Project</span>
 	</button>
