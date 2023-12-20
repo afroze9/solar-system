@@ -21,7 +21,7 @@
 	on:click={() => onTodoClicked(todo.id)}
 />
 
-{#if todo.isComplete}
+{#if !todo.isComplete}
 	<Graphics
 		{x}
 		{y}

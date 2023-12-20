@@ -26,7 +26,6 @@
 	function generateData() {
 		let sampleTodos = getSampleTodos(10);
 		todos.set(sampleTodos);
-		console.log($todos);
 
 		const mappedNodes = filteredTodos.map((todo, index): NodeData<Todo> => {
 			const angle = getAngle(index);
@@ -131,7 +130,6 @@
 	onMount(() => {
 		generateData();
 		const updateData = () => {
-			console.log(`todos`, $todos);
 			const mappedNodes = filteredTodos.map((todo, index): NodeData<Todo> => {
 				const baseAngle = getAngle(index);
 				const mappedNode = {
@@ -152,9 +150,6 @@
 	});
 
 	$: filteredTodos = $selectedTodo === 0 ? $todos : $todos.filter((t) => t.id === $selectedTodo);
-	$: {
-		console.log($selectedProject);
-	}
 </script>
 
 {#if $selectedProject !== 0}
