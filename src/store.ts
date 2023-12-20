@@ -46,3 +46,4 @@ export const selectedTodo = writable<number>(0);
 export const showSecondaryRing = writable<boolean>(false);
 export const showTertiaryRing = writable<boolean>(false);
 export const isTitleVisible = writable<boolean>(false);
+export const isStartAnimationDone = writable<boolean>(false);

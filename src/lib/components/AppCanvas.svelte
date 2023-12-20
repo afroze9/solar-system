@@ -3,17 +3,17 @@
 	import StarField from './StarField.svelte';
 	import SolarSystem from './SolarSystem.svelte';
 	import Title from './Title.svelte';
-	import { isAuthenticated, isLoading } from '../../store';
+	import { isAuthenticated, isLoading, isStartAnimationDone } from '../../store';
 	import Logo from './Logo.svelte';
 </script>
 
 <Application resizeTo={window} antialias={true}>
 	<StarField />
-	{#if !$isAuthenticated}
+	{#if !$isAuthenticated || !$isStartAnimationDone}
 		<Title />
 		<Logo />
 	{/if}
-	{#if $isAuthenticated}
+	{#if $isAuthenticated && $isStartAnimationDone}
 		<SolarSystem />
 	{/if}
 </Application>

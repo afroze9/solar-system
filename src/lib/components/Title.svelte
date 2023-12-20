@@ -1,20 +1,28 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import { auth } from '../../auth/authService';
-	import { isLoading, isTitleVisible } from '../../store';
+	import { isAuthenticated, isLoading, isStartAnimationDone, isTitleVisible } from '../../store';
+	import { animationDuration } from '../../constants';
 
 	let { login } = auth;
 
 	setTimeout(() => {
 		$isTitleVisible = true;
-	}, 3500);
+	}, animationDuration * 6);
+
+	setTimeout(
+		() => {
+			$isStartAnimationDone = true;
+		},
+		animationDuration * 7 + 1000
+	);
 </script>
 
 {#if $isTitleVisible}
 	<div class="title">
 		<h1 class="h1">Nexus PM</h1>
 		<h3 class="h3">A simple project management app built using the Nexus Framework</h3>
-		{#if !$isLoading}
+		{#if !$isLoading && !$isAuthenticated}
 			<button
 				type="button"
 				class="btn btn-xl variant-filled-primary login-btn mt-5"

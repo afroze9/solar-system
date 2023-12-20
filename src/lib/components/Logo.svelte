@@ -4,6 +4,7 @@
 	import { cubicInOut, linear } from 'svelte/easing';
 	import { tweened, type Tweened } from 'svelte/motion';
 	import { writable } from 'svelte/store';
+	import { animationDuration } from '../../constants';
 
 	type LogoNode = {
 		id: number;
@@ -50,46 +51,35 @@
 	const centerX = writable<number>(window.innerWidth / 2);
 	const centerY = writable<number>(window.innerHeight / 2);
 
-	const nodeAlphas: Alpha[] = [
-		{
-			id: 1,
-			type: 'node',
-			value: tweened(0, {
-				duration: 500,
-				easing: linear
-			})
-		}
-	];
-
 	const nodeAlpha1 = tweened(0, {
-		duration: 500,
+		duration: animationDuration,
 		easing: linear
 	});
 	const nodeAlpha2 = tweened(0, {
-		delay: 500,
-		duration: 500,
+		delay: animationDuration,
+		duration: animationDuration,
 		easing: linear
 	});
 	const nodeAlpha3 = tweened(0, {
-		delay: 1000,
-		duration: 500,
+		delay: animationDuration * 2,
+		duration: animationDuration,
 		easing: linear
 	});
 
 	const nodeAlpha4 = tweened(0, {
-		delay: 1500,
-		duration: 500,
+		delay: animationDuration * 3,
+		duration: animationDuration,
 		easing: linear
 	});
 
 	const nodeAlpha5 = tweened(0, {
-		delay: 2000,
-		duration: 500,
+		delay: animationDuration * 4,
+		duration: animationDuration,
 		easing: linear
 	});
 	const nodeAlpha6 = tweened(0, {
-		delay: 2500,
-		duration: 500,
+		delay: animationDuration * 5,
+		duration: animationDuration,
 		easing: linear
 	});
 
@@ -197,7 +187,7 @@
 		];
 
 		const updateData = () => {
-			$nodes = $nodes.map((node, index): LogoNode => {
+			$nodes = $nodes.map((node): LogoNode => {
 				if (node.id === 1) {
 					return {
 						...node,
@@ -240,7 +230,7 @@
 				return node;
 			});
 
-			$edges = $edges.map((edge, index): LogoEdge => {
+			$edges = $edges.map((edge): LogoEdge => {
 				if (edge.id === 1) {
 					return {
 						...edge,
@@ -291,7 +281,7 @@
 		nodeAlpha4.set(1);
 		nodeAlpha5.set(1);
 		nodeAlpha6.set(1);
-	}, 500);
+	}, animationDuration);
 </script>
 
 {#if $nodes.length > 0 && $edges.length > 0}

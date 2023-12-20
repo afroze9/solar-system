@@ -6,3 +6,5 @@ export const companySizeLarge: number = 60;
 
 export const rootSizeRegular: number = 80;
 export const rootSizeLarge: number = 300;
+
+export const animationDuration: number = 250;
