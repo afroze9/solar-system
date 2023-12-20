@@ -7,6 +7,7 @@
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
+	import { updated } from '$app/stores';
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -106,6 +107,27 @@
 		modalStore.trigger(modal);
 	}
 
+	function onTodoClicked(todoId: number) {
+		let todoToUpdate = $todos.filter((t) => t.id === todoId);
+		if (todoToUpdate === null || todoToUpdate.length === 0) {
+			return;
+		}
+
+		let updatedTodo: Todo = {
+			...todoToUpdate[0],
+			isComplete: !todoToUpdate[0].isComplete
+		};
+
+		const updatedTodoList = $todos.map((t) => {
+			if (t.id === todoId) {
+				return updatedTodo;
+			}
+			return t;
+		});
+
+		todos.set(updatedTodoList);
+	}
+
 	onMount(() => {
 		generateData();
 		const updateData = () => {
@@ -157,7 +179,7 @@
 
 {#if $selectedProject !== 0 && $todoNodes.length > 0}
 	{#each $todoNodes as todoNode, index (todoNode.nodeId)}
-		<TodoNode x={todoNode.x} y={todoNode.y} todo={todoNode.data} onTodoClicked={() => {}} />
+		<TodoNode x={todoNode.x} y={todoNode.y} todo={todoNode.data} {onTodoClicked} />
 	{/each}
 {/if}
 

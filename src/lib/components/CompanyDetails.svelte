@@ -113,10 +113,11 @@
 	}
 
 	function onProjectClicked(projectId: number) {
-		console.log('onProjectClicked', projectId);
 		selectedProject.set(projectId);
-		console.log('onProjectClicked', $selectedProject);
 		showTertiaryRing.set(true);
+		if ($scrollAngle !== 0) {
+			scrollAngle.set(0);
+		}
 	}
 
 	function onBackButtonClicked() {
