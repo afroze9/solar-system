@@ -63,3 +63,8 @@ type ProjectModalData = {
   id?: number;
   name: string;
 }
+
+type TodoModalData = {
+  id?: number;
+  name: string;
+}

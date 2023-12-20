@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte';
 	import CompanyModal from '../lib/components/CompanyModal.svelte';
 	import ProjectModal from '../lib/components/ProjectModal.svelte';
+	import TodoModal from '$lib/components/TodoModal.svelte';
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
@@ -24,6 +25,9 @@
 		},
 		projectModal: {
 			ref: ProjectModal
+		},
+		todoModal: {
+			ref: TodoModal
 		}
 	};
 </script>

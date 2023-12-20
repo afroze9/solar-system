@@ -82,6 +82,30 @@
 		}
 	}
 
+	const modalStore = getModalStore();
+
+	const modal: ModalSettings = {
+		type: 'component',
+		component: 'todoModal',
+		title: 'Add Project',
+		response: addTodo
+	};
+
+	function addTodo(data: TodoModalData) {
+		let newTodo: Todo = {
+			id: Math.max(...$todos.map((t) => t.id)) + 1,
+			color: colors[Math.floor(Math.random() * colors.length)],
+			name: data.name,
+			description: '',
+			isComplete: false
+		};
+		$todos.push(newTodo);
+	}
+
+	function onAddTodoClicked() {
+		modalStore.trigger(modal);
+	}
+
 	onMount(() => {
 		generateData();
 		const updateData = () => {
@@ -125,7 +149,7 @@
 		on:pointerleave={stopScrollDown}>v</button
 	>
 
-	<button type="button" class="btn variant-filled add-todo-btn">
+	<button type="button" class="btn variant-filled add-todo-btn" on:click={onAddTodoClicked}>
 		<i class="fa-solid fa-plus" />
 		<span>Add Todo</span>
 	</button>
