@@ -87,7 +87,7 @@
 	const modal: ModalSettings = {
 		type: 'component',
 		component: 'todoModal',
-		title: 'Add Project',
+		title: 'Add Todo',
 		response: addTodo
 	};
 
