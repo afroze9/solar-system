@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { Graphics, Text } from 'svelte-pixi';
-	import { ringSize, selectedCompany } from '../../store';
+	import { Graphics } from 'svelte-pixi';
+	import { ringSize } from '../../store';
 	import { writable } from 'svelte/store';
 
 	export let x: number = 0;
@@ -11,7 +11,6 @@
 	export let showTertiaryRing: boolean = false;
 
 	let color = writable<number>(0xfccd85);
-	let isHovered = writable<boolean>(false);
 </script>
 
 <Graphics

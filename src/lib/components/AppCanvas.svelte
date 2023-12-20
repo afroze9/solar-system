@@ -4,12 +4,14 @@
 	import SolarSystem from './SolarSystem.svelte';
 	import Title from './Title.svelte';
 	import { isAuthenticated, isLoading } from '../../store';
+	import Logo from './Logo.svelte';
 </script>
 
 <Application resizeTo={window} antialias={true}>
 	<StarField />
 	{#if !$isAuthenticated}
 		<Title />
+		<Logo />
 	{/if}
 	{#if $isAuthenticated}
 		<SolarSystem />
