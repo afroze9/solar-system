@@ -17,7 +17,8 @@
 	import ProjectDetails from './ProjectDetails.svelte';
 	import { Text } from 'svelte-pixi';
 	import companyApi from '../../services/CompanyApi';
-	import ApiHelpers from '../../services/ApiHelpers';
+	import ApiHelpers, { type ErrorResponse } from '../../services/ApiHelpers';
+	import projectApi, { type ProjectResponse } from '../../services/ProjectApi';
 	const toastStore = getToastStore();
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
@@ -123,14 +124,26 @@
 		response: addProject
 	};
 
-	function addProject(data: ProjectModalData) {
-		let newProject: Project = {
-			id: Math.max(...$projects.map((p) => p.id)) + 1,
-			color: colors[Math.floor(Math.random() * colors.length)],
+	async function addProject(data: ProjectModalData) {
+		let response = await projectApi.createProject({
 			name: data.name,
-			todoCount: Math.floor(Math.random() * 20)
-		};
-		$projects.push(newProject);
+			companyId: $selectedCompany
+		});
+
+		if (!ApiHelpers.isErrorReponse(response)) {
+			const newProjectResponse = response as ProjectResponse;
+			$projects.push({
+				id: newProjectResponse.id,
+				name: newProjectResponse.name,
+				todoCount: newProjectResponse.todoItems.length,
+				color: colors[Math.floor(Math.random() * colors.length)]
+			});
+		} else {
+			toastStore.trigger({
+				message: (response as ErrorResponse).message,
+				background: 'variant-filled-error'
+			});
+		}
 	}
 
 	function onAddProjectClicked() {

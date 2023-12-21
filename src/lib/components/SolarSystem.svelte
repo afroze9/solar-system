@@ -59,15 +59,6 @@
 			});
 		}
 
-		// let ids = $companies.map((c) => c.id);
-		// let newId = ids.length === 0 ? 1 : Math.max(...$companies.map((c) => c.id)) + 1;
-		// let newCompany: Company = {
-		// 	id: newId,
-		// 	name: data.name,
-		// 	projectCount: Math.floor(Math.random() * 20),
-		// 	color: colors[Math.floor(Math.random() * colors.length)]
-		// };
-		// $companies.push(newCompany);
 		rootX.set(window.innerWidth / 2);
 		rotationEnabled.set(true);
 

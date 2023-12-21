@@ -4,10 +4,14 @@
 	import { tweened } from 'svelte/motion';
 	import { writable } from 'svelte/store';
 	import { ringSize, rootX, rootY, selectedProject, selectedTodo } from '../../store';
-	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { getModalStore, getToastStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
-    import { Text } from 'svelte-pixi';
+	import { Text } from 'svelte-pixi';
+	import projectApi from '../../services/ProjectApi';
+	import ApiHelpers from '../../services/ApiHelpers';
+
+	const toastStore = getToastStore();
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -23,23 +27,45 @@
 		return -0.3 + $scrollAngle + index * 0.1;
 	}
 
-	function generateData() {
-		let sampleTodos = getSampleTodos(10);
-		todos.set(sampleTodos);
+	async function fetchProject() {
+		let response = await projectApi.getProjectById($selectedProject);
 
-		const mappedNodes = filteredTodos.map((todo, index): NodeData<Todo> => {
-			const angle = getAngle(index);
-			const mappedNode = {
-				nodeId: `p${todo.id}`,
-				angle: angle,
-				x: $rootX + Math.cos(angle) * $ringSize * 2.25,
-				y: $rootY + Math.sin(angle) * $ringSize * 2.25,
-				color: todo.color,
-				data: todo
-			};
-			return mappedNode;
+		if (!ApiHelpers.isErrorReponse(response)) {
+			let mappedTodos = response.todoItems.map((t): Todo => {
+				return {
+					id: t.id,
+					name: t.title,
+					description: t.description,
+					isComplete: t.isCompleted,
+					color: colors[Math.floor(Math.random() * colors.length)]
+				};
+			});
+
+			todos.set(mappedTodos);
+		} else {
+			toastStore.trigger({
+				message: response.message,
+				background: 'variant-filled-error'
+			});
+		}
+	}
+
+	function generateData() {
+		fetchProject().then(() => {
+			const mappedNodes = filteredTodos.map((todo, index): NodeData<Todo> => {
+				const angle = getAngle(index);
+				const mappedNode = {
+					nodeId: `p${todo.id}`,
+					angle: angle,
+					x: $rootX + Math.cos(angle) * $ringSize * 2.25,
+					y: $rootY + Math.sin(angle) * $ringSize * 2.25,
+					color: todo.color,
+					data: todo
+				};
+				return mappedNode;
+			});
+			todoNodes.set(mappedNodes);
 		});
-		todoNodes.set(mappedNodes);
 	}
 
 	function scrollUp() {
