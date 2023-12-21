@@ -272,16 +272,32 @@
 		};
 
 		updateData();
+		startAnimation();
 	});
 
-	setTimeout(() => {
-		nodeAlpha1.set(1);
-		nodeAlpha2.set(1);
-		nodeAlpha3.set(1);
-		nodeAlpha4.set(1);
-		nodeAlpha5.set(1);
-		nodeAlpha6.set(1);
-	}, animationDuration);
+	function startAnimation() {
+		setTimeout(() => {
+			nodeAlpha1.set(1);
+			nodeAlpha2.set(1);
+			nodeAlpha3.set(1);
+			nodeAlpha4.set(1);
+			nodeAlpha5.set(1);
+			nodeAlpha6.set(1);
+			resetAnimation();
+		}, animationDuration);
+	}
+
+	function resetAnimation() {
+		setTimeout(() => {
+			nodeAlpha1.set(0, { easing: linear, delay: 0, duration: 10 });
+			nodeAlpha2.set(0, { easing: linear, delay: 0, duration: 10 });
+			nodeAlpha3.set(0, { easing: linear, delay: 0, duration: 10 });
+			nodeAlpha4.set(0, { easing: linear, delay: 0, duration: 10 });
+			nodeAlpha5.set(0, { easing: linear, delay: 0, duration: 10 });
+			nodeAlpha6.set(0, { easing: linear, delay: 0, duration: 10 });
+			startAnimation();
+		}, animationDuration * 20);
+	}
 </script>
 
 {#if $nodes.length > 0 && $edges.length > 0}
