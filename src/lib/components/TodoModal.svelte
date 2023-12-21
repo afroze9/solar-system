@@ -1,20 +1,27 @@
 <script lang="ts">
 	// Stores
 	import { getModalStore } from '@skeletonlabs/skeleton';
+	import { field, form, style } from 'svelte-forms';
+	import { required, min } from 'svelte-forms/validators';
 
 	const modalStore = getModalStore();
 
-	// Form Data
-	const formData: TodoModalData = {
-		name: 'Todo A'
-	};
+	const name = field('name', '', [required(), min(5)], {
+		validateOnChange: true,
+		valid: false
+	});
+	const todoForm = form(name);
 
 	// We've created a custom submit function to pass the response and close the modal.
 	function onFormSubmit(): void {
-		if ($modalStore[0].response) {
-			$modalStore[0].response(formData);
+		if ($todoForm.valid) {
+			if ($modalStore[0].response) {
+				$modalStore[0].response({
+					name: $name.value
+				});
+			}
+			modalStore.close();
 		}
-		modalStore.close();
 	}
 
 	function onClose(): void {
@@ -39,7 +46,8 @@
 				<input
 					class="input"
 					type="text"
-					bind:value={formData.name}
+					bind:value={$name.value}
+					use:style={{ field: name, valid: 'input-success', invalid: 'input-error' }}
 					placeholder="Enter todo summary..."
 				/>
 			</label>

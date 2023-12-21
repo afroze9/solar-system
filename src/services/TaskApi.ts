@@ -18,7 +18,7 @@ export type TodoItem = {
 };
 
 export type UpdateTodoItemModel = {
-	markComplete: boolean;
+	isCompleted: boolean;
 	assignedToId: string;
 };
 

@@ -8,8 +8,9 @@
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
 	import { Text } from 'svelte-pixi';
-	import projectApi from '../../services/ProjectApi';
-	import ApiHelpers from '../../services/ApiHelpers';
+	import projectApi, { type TodoItem } from '../../services/ProjectApi';
+	import ApiHelpers, { type ErrorResponse } from '../../services/ApiHelpers';
+	import taskApi from '../../services/TaskApi';
 
 	const toastStore = getToastStore();
 
@@ -117,22 +118,34 @@
 		response: addTodo
 	};
 
-	function addTodo(data: TodoModalData) {
-		let newTodo: Todo = {
-			id: Math.max(...$todos.map((t) => t.id)) + 1,
-			color: colors[Math.floor(Math.random() * colors.length)],
-			name: data.name,
-			description: '',
-			isComplete: false
-		};
-		$todos.push(newTodo);
+	async function addTodo(data: TodoModalData) {
+		let response = await taskApi.createTask($selectedProject, {
+			title: data.name,
+			description: 'Test Task Description'
+		});
+
+		if (!ApiHelpers.isErrorReponse(response)) {
+			const newTodoResponse = response as TodoItem;
+			$todos.push({
+				id: newTodoResponse.id,
+				name: newTodoResponse.title,
+				description: newTodoResponse.description,
+				isComplete: newTodoResponse.isCompleted,
+				color: colors[Math.floor(Math.random() * colors.length)]
+			});
+		} else {
+			toastStore.trigger({
+				message: (response as ErrorResponse).message,
+				background: 'variant-filled-error'
+			});
+		}
 	}
 
 	function onAddTodoClicked() {
 		modalStore.trigger(modal);
 	}
 
-	function onTodoClicked(todoId: number) {
+	async function onTodoClicked(todoId: number) {
 		let todoToUpdate = $todos.filter((t) => t.id === todoId);
 		if (todoToUpdate === null || todoToUpdate.length === 0) {
 			return;
@@ -143,14 +156,26 @@
 			isComplete: !todoToUpdate[0].isComplete
 		};
 
-		const updatedTodoList = $todos.map((t) => {
-			if (t.id === todoId) {
-				return updatedTodo;
-			}
-			return t;
+		let response = await taskApi.updateTodo(todoId, {
+			isCompleted: updatedTodo.isComplete,
+			assignedToId: ''
 		});
 
-		todos.set(updatedTodoList);
+		if (!ApiHelpers.isErrorReponse(response)) {
+			const updatedTodoList = $todos.map((t) => {
+				if (t.id === todoId) {
+					return updatedTodo;
+				}
+				return t;
+			});
+
+			todos.set(updatedTodoList);
+		} else {
+			toastStore.trigger({
+				message: (response as ErrorResponse).message,
+				background: 'variant-filled-error'
+			});
+		}
 	}
 
 	onMount(() => {
