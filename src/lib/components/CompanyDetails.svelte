@@ -207,16 +207,17 @@
 			<i class="fa-solid fa-plus" />
 			<span>Add Project</span>
 		</button>
-		<Text
-			x={window.innerWidth / 2 - 500}
-			y={15}
-			text={'Projects'}
-			style={{
-				fill: 'white',
-				fontSize: '30px'
-			}}
-		/>
 	{/if}
+	<Text
+		x={$rootX + Math.cos(-0.5) * 750}
+		y={$rootY + Math.sin(-0.5) * 750}
+		anchor={0.5}
+		text={'Projects'}
+		style={{
+			fill: 'white',
+			fontSize: '30px'
+		}}
+	/>
 {/if}
 
 {#if $selectedProject !== 0}

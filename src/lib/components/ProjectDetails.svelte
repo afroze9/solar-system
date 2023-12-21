@@ -222,8 +222,8 @@
 		<span>Add Todo</span>
 	</button>
 	<Text
-		x={window.innerWidth / 2 - 500}
-		y={15}
+		x={$rootX + Math.cos(-0.4) * $ringSize * 2.2}
+		y={$rootY + Math.sin(-0.4) * $ringSize * 2.2}
 		text={'Todos'}
 		style={{
 			fill: 'white',

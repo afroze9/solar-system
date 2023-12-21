@@ -239,8 +239,9 @@
 
 {#if $selectedCompany === 0}
 	<Text
-		x={window.innerWidth / 2 - 500}
-		y={15}
+		x={$rootX}
+		y={$rootY}
+		anchor={0.5}
 		text={'Companies'}
 		style={{
 			fill: 'white',
