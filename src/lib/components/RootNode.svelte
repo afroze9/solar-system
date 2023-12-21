@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { Graphics } from 'svelte-pixi';
-	import { ringSize } from '../../store';
+	import { ringSize, showActivity } from '../../store';
 	import { writable } from 'svelte/store';
+	import { cubicOut } from 'svelte/easing';
+	import { tweened } from 'svelte/motion';
+	import { onMount } from 'svelte';
 
 	export let x: number = 0;
 	export let y: number = 0;
@@ -11,6 +14,32 @@
 	export let showTertiaryRing: boolean = false;
 
 	let color = writable<number>(0xfccd85);
+
+	// Solar flare properties
+	let flareSize = tweened(0, {
+		duration: 1000,
+		easing: cubicOut
+	});
+	let opacity = tweened(0.8, {
+		duration: 100,
+		easing: cubicOut
+	});
+
+	// Start a flare effect
+	function startFlare() {
+		flareSize.set(size); // start size
+		opacity.set(0.4);
+
+		setTimeout(() => {
+			flareSize.set(0, { duration: 10 }); // Shrink back after a delay
+			opacity.set(0, { duration: 10 });
+		}, 600); // Delay in milliseconds
+	}
+
+	onMount(() => {
+		const interval = setInterval(startFlare, 800);
+		return () => clearInterval(interval);
+	});
 </script>
 
 <Graphics
@@ -21,6 +50,11 @@
 		graphics.beginFill($color);
 		graphics.drawCircle(0, 0, size);
 		graphics.endFill();
+		$: {
+			graphics.beginFill(0xffa500, $opacity); // Orange color, semi-transparent
+			graphics.drawCircle(0, 0, $showActivity ? $flareSize : 0);
+			graphics.endFill();
+		}
 	}}
 ></Graphics>
 

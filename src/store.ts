@@ -30,6 +30,8 @@ export const rootSize = tweened(rootSizeRegular, {
   easing: cubicOut
 });
 
+export const showActivity = writable<boolean>(false);
+
 export const ringSize = tweened(ringSizeRegular, {
   duration: 2500,
   easing: cubicOut

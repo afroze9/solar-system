@@ -3,7 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { tweened } from 'svelte/motion';
 	import { writable } from 'svelte/store';
-	import { ringSize, rootX, rootY, selectedProject, selectedTodo } from '../../store';
+	import { ringSize, rootX, rootY, selectedProject, selectedTodo, showActivity } from '../../store';
 	import { getModalStore, getToastStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
@@ -29,6 +29,7 @@
 	}
 
 	async function fetchProject() {
+		showActivity.set(true);
 		let response = await projectApi.getProjectById($selectedProject);
 
 		if (!ApiHelpers.isErrorReponse(response)) {
@@ -49,6 +50,7 @@
 				background: 'variant-filled-error'
 			});
 		}
+		showActivity.set(false);
 	}
 
 	function generateData() {
@@ -119,6 +121,7 @@
 	};
 
 	async function addTodo(data: TodoModalData) {
+		showActivity.set(true);
 		let response = await taskApi.createTask($selectedProject, {
 			title: data.name,
 			description: 'Test Task Description'
@@ -139,6 +142,7 @@
 				background: 'variant-filled-error'
 			});
 		}
+		showActivity.set(false);
 	}
 
 	function onAddTodoClicked() {
@@ -146,6 +150,7 @@
 	}
 
 	async function onTodoClicked(todoId: number) {
+		showActivity.set(true);
 		let todoToUpdate = $todos.filter((t) => t.id === todoId);
 		if (todoToUpdate === null || todoToUpdate.length === 0) {
 			return;
@@ -176,6 +181,7 @@
 				background: 'variant-filled-error'
 			});
 		}
+		showActivity.set(false);
 	}
 
 	onMount(() => {

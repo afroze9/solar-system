@@ -6,6 +6,7 @@
 		selectedCompany,
 		selectedProject,
 		selectedTodo,
+		showActivity,
 		showTertiaryRing
 	} from '../../store';
 	import { colors, getSampleProjects } from '$lib/helpers';
@@ -36,6 +37,7 @@
 	}
 
 	async function fetchCompany() {
+		showActivity.set(true);
 		let response = await companyApi.getCompanyById($selectedCompany);
 
 		if (!ApiHelpers.isErrorReponse(response)) {
@@ -55,6 +57,7 @@
 				background: 'variant-filled-error'
 			});
 		}
+		showActivity.set(false);
 	}
 
 	function generateData() {
@@ -125,6 +128,7 @@
 	};
 
 	async function addProject(data: ProjectModalData) {
+		showActivity.set(true);
 		let response = await projectApi.createProject({
 			name: data.name,
 			companyId: $selectedCompany
@@ -144,6 +148,7 @@
 				background: 'variant-filled-error'
 			});
 		}
+		showActivity.set(false);
 	}
 
 	function onAddProjectClicked() {

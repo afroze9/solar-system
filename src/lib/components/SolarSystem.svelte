@@ -16,7 +16,8 @@
 		selectedCompany,
 		showSecondaryRing,
 		showTertiaryRing,
-		selectedProject
+		selectedProject,
+		showActivity
 	} from '../../store';
 	import { writable } from 'svelte/store';
 	import {
@@ -40,6 +41,7 @@
 	const modalStore = getModalStore();
 
 	async function addCompany(data: CompanyModalData) {
+		showActivity.set(true);
 		let response = await companyApi.createCompany({
 			name: data.name,
 			tags: ['companytag1', 'companytag2']
@@ -65,6 +67,7 @@
 		rootSize.set(rootSizeRegular);
 		ringSize.set(ringSizeRegular);
 		companySize.set(companySizeRegular);
+		showActivity.set(false);
 	}
 
 	const modal: ModalSettings = {
@@ -130,6 +133,7 @@
 	}
 
 	async function fetchCompanies() {
+		showActivity.set(true);
 		let response = await companyApi.getCompanies();
 		if (!ApiHelpers.isErrorReponse(response)) {
 			let mappedCompanies = response.map((c): Company => {
@@ -147,6 +151,7 @@
 				background: 'variant-filled-error'
 			});
 		}
+		showActivity.set(false);
 	}
 
 	function generateData() {
