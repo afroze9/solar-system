@@ -3,7 +3,7 @@
 	import CompanyNode from './CompanyNode.svelte';
 	import { onMount } from 'svelte';
 	import { colors } from '$lib/helpers';
-	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { getModalStore, getToastStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { Text } from 'svelte-pixi';
 	import {
 		companies,
@@ -28,24 +28,46 @@
 		rootSizeRegular
 	} from '../../constants';
 	import CompanyDetails from './CompanyDetails.svelte';
+	import companyApi, { type CompanyResponse } from '../../services/CompanyApi';
+	import ApiHelpers, { type ErrorResponse } from '../../services/ApiHelpers';
 
 	let filteredCompanies: Company[] = [];
 	let companyNodes = writable<CompanyNodeData[]>([]);
 	let previousNodeCount = writable<number>(0);
 	let numberOfRings = writable<number>(0);
 
+	const toastStore = getToastStore();
 	const modalStore = getModalStore();
 
-	function addCompany(data: CompanyModalData) {
-		let ids = $companies.map((c) => c.id);
-		let newId = ids.length === 0 ? 1 : Math.max(...$companies.map((c) => c.id)) + 1;
-		let newCompany: Company = {
-			id: newId,
+	async function addCompany(data: CompanyModalData) {
+		let response = await companyApi.createCompany({
 			name: data.name,
-			projectCount: Math.floor(Math.random() * 20),
-			color: colors[Math.floor(Math.random() * colors.length)]
-		};
-		$companies.push(newCompany);
+			tags: ['companytag1', 'companytag2']
+		});
+		if (!ApiHelpers.isErrorReponse(response)) {
+			const newCompanyResponse = response as CompanyResponse;
+			$companies.push({
+				id: newCompanyResponse.id,
+				name: newCompanyResponse.name,
+				projectCount: newCompanyResponse.projects.length,
+				color: colors[Math.floor(Math.random() * colors.length)]
+			});
+		} else {
+			toastStore.trigger({
+				message: (response as ErrorResponse).message,
+				background: 'variant-filled-error'
+			});
+		}
+
+		// let ids = $companies.map((c) => c.id);
+		// let newId = ids.length === 0 ? 1 : Math.max(...$companies.map((c) => c.id)) + 1;
+		// let newCompany: Company = {
+		// 	id: newId,
+		// 	name: data.name,
+		// 	projectCount: Math.floor(Math.random() * 20),
+		// 	color: colors[Math.floor(Math.random() * colors.length)]
+		// };
+		// $companies.push(newCompany);
 		rootX.set(window.innerWidth / 2);
 		rotationEnabled.set(true);
 
@@ -116,17 +138,39 @@
 		return ringNumber * 0.001;
 	}
 
+	async function fetchCompanies() {
+		let response = await companyApi.getCompanies();
+		if (!ApiHelpers.isErrorReponse(response)) {
+			let mappedCompanies = response.map((c): Company => {
+				return {
+					id: c.id,
+					name: c.name,
+					projectCount: c.projectCount,
+					color: colors[Math.floor(Math.random() * colors.length)]
+				};
+			});
+			companies.set(mappedCompanies);
+		} else {
+			toastStore.trigger({
+				message: response.message,
+				background: 'variant-filled-error'
+			});
+		}
+	}
+
 	function generateData() {
-		$companyNodes = filteredCompanies.map((company, index): CompanyNodeData => {
-			const angle = getAngle(index, $companies.length);
-			return {
-				nodeId: `c${company.id}`,
-				angle: angle,
-				x: $rootX + Math.cos(angle) * getRingDistance(index),
-				y: $rootY + Math.sin(angle) * getRingDistance(index),
-				color: company.color,
-				company: company
-			};
+		fetchCompanies().then(() => {
+			$companyNodes = filteredCompanies.map((company, index): CompanyNodeData => {
+				const angle = getAngle(index, $companies.length);
+				return {
+					nodeId: `c${company.id}`,
+					angle: angle,
+					x: $rootX + Math.cos(angle) * getRingDistance(index),
+					y: $rootY + Math.sin(angle) * getRingDistance(index),
+					color: company.color,
+					company: company
+				};
+			});
 		});
 	}
 

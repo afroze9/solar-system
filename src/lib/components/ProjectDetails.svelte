@@ -7,8 +7,7 @@
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
-	import { updated } from '$app/stores';
-	import { Text } from 'svelte-pixi';
+    import { Text } from 'svelte-pixi';
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;

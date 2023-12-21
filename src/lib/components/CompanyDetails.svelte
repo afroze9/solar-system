@@ -13,9 +13,12 @@
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
-	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { getModalStore, getToastStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import ProjectDetails from './ProjectDetails.svelte';
 	import { Text } from 'svelte-pixi';
+	import companyApi from '../../services/CompanyApi';
+	import ApiHelpers from '../../services/ApiHelpers';
+	const toastStore = getToastStore();
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -31,23 +34,44 @@
 		return -0.3 + $scrollAngle + index * 0.1;
 	}
 
-	function generateData() {
-		let sampleProjects = getSampleProjects(10);
-		projects.set(sampleProjects);
+	async function fetchCompany() {
+		let response = await companyApi.getCompanyById($selectedCompany);
 
-		const mappedNodes = filteredProjects.map((project, index): NodeData<Project> => {
-			const angle = getAngle(index);
-			const mappedNode = {
-				nodeId: `p${project.id}`,
-				angle: angle,
-				x: $rootX + Math.cos(angle) * 750,
-				y: $rootY + Math.sin(angle) * 750,
-				color: project.color,
-				data: project
-			};
-			return mappedNode;
+		if (!ApiHelpers.isErrorReponse(response)) {
+			let mappedProjects = response.projects.map((p): Project => {
+				return {
+					id: p.id,
+					name: p.name,
+					todoCount: p.taskCount,
+					color: colors[Math.floor(Math.random() * colors.length)]
+				};
+			});
+
+			projects.set(mappedProjects);
+		} else {
+			toastStore.trigger({
+				message: response.message,
+				background: 'variant-filled-error'
+			});
+		}
+	}
+
+	function generateData() {
+		fetchCompany().then(() => {
+			const mappedNodes = filteredProjects.map((project, index): NodeData<Project> => {
+				const angle = getAngle(index);
+				const mappedNode = {
+					nodeId: `p${project.id}`,
+					angle: angle,
+					x: $rootX + Math.cos(angle) * 750,
+					y: $rootY + Math.sin(angle) * 750,
+					color: project.color,
+					data: project
+				};
+				return mappedNode;
+			});
+			projectNodes.set(mappedNodes);
 		});
-		projectNodes.set(mappedNodes);
 	}
 
 	function scrollUp() {
