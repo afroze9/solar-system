@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { colors } from '$lib/helpers';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
+	import { Text } from 'svelte-pixi';
 	import {
 		companies,
 		rotationEnabled,
@@ -202,6 +203,15 @@
 {/if}
 
 {#if $selectedCompany === 0}
+	<Text
+		x={window.innerWidth / 2 - 500}
+		y={15}
+		text={'Companies'}
+		style={{
+			fill: 'white',
+			fontSize: '30px'
+		}}
+	/>
 	<button
 		type="button"
 		class="btn variant-filled add-company-btn"

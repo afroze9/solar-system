@@ -6,9 +6,12 @@
 
 	let { login } = auth;
 
-	setTimeout(() => {
-		$isTitleVisible = true;
-	}, animationDuration * 6);
+	setTimeout(
+		() => {
+			$isTitleVisible = true;
+		},
+		animationDuration * 6 + 500
+	);
 
 	setTimeout(
 		() => {

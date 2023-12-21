@@ -15,6 +15,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { getModalStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import ProjectDetails from './ProjectDetails.svelte';
+	import { Text } from 'svelte-pixi';
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -169,6 +170,15 @@
 			<i class="fa-solid fa-plus" />
 			<span>Add Project</span>
 		</button>
+		<Text
+			x={window.innerWidth / 2 - 500}
+			y={15}
+			text={'Projects'}
+			style={{
+				fill: 'white',
+				fontSize: '30px'
+			}}
+		/>
 	{/if}
 {/if}
 

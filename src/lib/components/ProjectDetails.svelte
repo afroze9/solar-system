@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
 	import { updated } from '$app/stores';
+	import { Text } from 'svelte-pixi';
 
 	let scrollDownIntervalId: NodeJS.Timeout | null;
 	let scrollUpIntervalId: NodeJS.Timeout | null;
@@ -170,6 +171,15 @@
 		<i class="fa-solid fa-plus" />
 		<span>Add Todo</span>
 	</button>
+	<Text
+		x={window.innerWidth / 2 - 500}
+		y={15}
+		text={'Todos'}
+		style={{
+			fill: 'white',
+			fontSize: '30px'
+		}}
+	/>
 {/if}
 
 {#if $selectedProject !== 0 && $todoNodes.length > 0}
