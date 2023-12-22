@@ -7,15 +7,14 @@
 	import { getModalStore, getToastStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
 	import TodoNode from './TodoNode.svelte';
-	import { Text } from 'svelte-pixi';
+	import { Graphics, Text } from 'svelte-pixi';
 	import projectApi, { type TodoItem } from '../../services/ProjectApi';
 	import ApiHelpers, { type ErrorResponse } from '../../services/ApiHelpers';
 	import taskApi from '../../services/TaskApi';
 
 	const toastStore = getToastStore();
+	const spotColor = 0xc9a36a;
 
-	let scrollDownIntervalId: NodeJS.Timeout | null;
-	let scrollUpIntervalId: NodeJS.Timeout | null;
 	let todos = writable<Todo[]>([]);
 	let filteredTodos: Todo[] = [];
 	let todoNodes = writable<NodeData<Todo>[]>([]);
@@ -23,6 +22,13 @@
 		duration: 750,
 		easing: cubicOut
 	});
+
+	function handleScroll(e: WheelEvent) {
+		if ($selectedProject !== 0) {
+			let oldAngle = $scrollAngle;
+			scrollAngle.set(oldAngle + (0.15 * -1 * e.deltaY) / 100);
+		}
+	}
 
 	function getAngle(index: number): number {
 		return -0.3 + $scrollAngle + index * 0.1;
@@ -69,46 +75,6 @@
 			});
 			todoNodes.set(mappedNodes);
 		});
-	}
-
-	function scrollUp() {
-		let oldAngle = $scrollAngle;
-		scrollAngle.set(oldAngle + 0.15);
-	}
-
-	function scrollDown() {
-		let oldAngle = $scrollAngle;
-		scrollAngle.set(oldAngle - 0.15);
-	}
-
-	function startScrollDown() {
-		if (scrollDownIntervalId) {
-			clearInterval(scrollDownIntervalId);
-		}
-
-		scrollDownIntervalId = setInterval(scrollDown, 100);
-	}
-
-	function stopScrollDown() {
-		if (scrollDownIntervalId) {
-			clearInterval(scrollDownIntervalId);
-			scrollDownIntervalId = null;
-		}
-	}
-
-	function startScrollUp() {
-		if (scrollUpIntervalId) {
-			clearInterval(scrollUpIntervalId);
-		}
-
-		scrollUpIntervalId = setInterval(scrollUp, 100);
-	}
-
-	function stopScrollUp() {
-		if (scrollUpIntervalId) {
-			clearInterval(scrollUpIntervalId);
-			scrollUpIntervalId = null;
-		}
 	}
 
 	const modalStore = getModalStore();
@@ -204,25 +170,17 @@
 		};
 
 		updateData();
+		window.addEventListener('wheel', handleScroll);
+
+		return () => {
+			window.removeEventListener('wheel', handleScroll);
+		};
 	});
 
 	$: filteredTodos = $selectedTodo === 0 ? $todos : $todos.filter((t) => t.id === $selectedTodo);
 </script>
 
 {#if $selectedProject !== 0}
-	<button
-		type="button"
-		class="btn variant-filled scroll-up-btn"
-		on:pointerover={startScrollUp}
-		on:pointerleave={stopScrollUp}>^</button
-	>
-	<button
-		type="button"
-		class="btn variant-filled scroll-down-btn"
-		on:pointerover={startScrollDown}
-		on:pointerleave={stopScrollDown}>v</button
-	>
-
 	<button type="button" class="btn variant-filled add-todo-btn" on:click={onAddTodoClicked}>
 		<i class="fa-solid fa-plus" />
 		<span>Add Todo</span>
@@ -242,23 +200,40 @@
 	{#each $todoNodes as todoNode, index (todoNode.nodeId)}
 		<TodoNode x={todoNode.x} y={todoNode.y} todo={todoNode.data} {onTodoClicked} />
 	{/each}
+	<Graphics
+		x={$rootX + Math.cos($scrollAngle + (Math.PI * 2) / 3) * 250}
+		y={$rootY + Math.sin($scrollAngle + (Math.PI * 2) / 3) * 250}
+		draw={(graphics) => {
+			graphics.clear();
+			graphics.beginFill(spotColor);
+			graphics.drawCircle(0, 0, 20);
+			graphics.endFill();
+		}}
+	/>
+	<Graphics
+		x={$rootX + Math.cos($scrollAngle + (Math.PI * 4) / 3) * 250}
+		y={$rootY + Math.sin($scrollAngle + (Math.PI * 4) / 3) * 250}
+		draw={(graphics) => {
+			graphics.clear();
+			graphics.beginFill(spotColor);
+			graphics.drawCircle(0, 0, 20);
+			graphics.endFill();
+		}}
+	/>
+
+	<Graphics
+		x={$rootX + Math.cos($scrollAngle) * 250}
+		y={$rootY + Math.sin($scrollAngle) * 250}
+		draw={(graphics) => {
+			graphics.clear();
+			graphics.beginFill(spotColor);
+			graphics.drawCircle(0, 0, 20);
+			graphics.endFill();
+		}}
+	/>
 {/if}
 
 <style>
-	.scroll-up-btn {
-		position: absolute;
-		z-index: 10;
-		top: 10px;
-		left: 50%;
-	}
-
-	.scroll-down-btn {
-		position: absolute;
-		z-index: 10;
-		bottom: 10px;
-		left: 50%;
-	}
-
 	.add-todo-btn {
 		position: absolute;
 		z-index: 10;

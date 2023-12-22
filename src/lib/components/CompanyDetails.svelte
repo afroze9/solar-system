@@ -5,25 +5,22 @@
 		rootY,
 		selectedCompany,
 		selectedProject,
-		selectedTodo,
 		showActivity,
 		showTertiaryRing
 	} from '../../store';
-	import { colors, getSampleProjects } from '$lib/helpers';
+	import { colors } from '$lib/helpers';
 	import ProjectNode from './ProjectNode.svelte';
 	import { onMount } from 'svelte';
 	import { tweened } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
 	import { getModalStore, getToastStore, type ModalSettings } from '@skeletonlabs/skeleton';
 	import ProjectDetails from './ProjectDetails.svelte';
-	import { Text } from 'svelte-pixi';
+	import { Graphics, Text } from 'svelte-pixi';
 	import companyApi from '../../services/CompanyApi';
 	import ApiHelpers, { type ErrorResponse } from '../../services/ApiHelpers';
 	import projectApi, { type ProjectResponse } from '../../services/ProjectApi';
 	const toastStore = getToastStore();
-
-	let scrollDownIntervalId: NodeJS.Timeout | null;
-	let scrollUpIntervalId: NodeJS.Timeout | null;
+	const spotColor = 0xc9a36a;
 	let projects = writable<Project[]>([]);
 	let filteredProjects: Project[] = [];
 	let projectNodes = writable<NodeData<Project>[]>([]);
@@ -31,6 +28,13 @@
 		duration: 750,
 		easing: cubicOut
 	});
+
+	function handleScroll(e: WheelEvent) {
+		if ($selectedProject === 0) {
+			let oldAngle = $scrollAngle;
+			scrollAngle.set(oldAngle + (0.15 * -1 * e.deltaY) / 100);
+		}
+	}
 
 	function getAngle(index: number): number {
 		return -0.3 + $scrollAngle + index * 0.1;
@@ -76,46 +80,6 @@
 			});
 			projectNodes.set(mappedNodes);
 		});
-	}
-
-	function scrollUp() {
-		let oldAngle = $scrollAngle;
-		scrollAngle.set(oldAngle + 0.15);
-	}
-
-	function scrollDown() {
-		let oldAngle = $scrollAngle;
-		scrollAngle.set(oldAngle - 0.15);
-	}
-
-	function startScrollDown() {
-		if (scrollDownIntervalId) {
-			clearInterval(scrollDownIntervalId);
-		}
-
-		scrollDownIntervalId = setInterval(scrollDown, 100);
-	}
-
-	function stopScrollDown() {
-		if (scrollDownIntervalId) {
-			clearInterval(scrollDownIntervalId);
-			scrollDownIntervalId = null;
-		}
-	}
-
-	function startScrollUp() {
-		if (scrollUpIntervalId) {
-			clearInterval(scrollUpIntervalId);
-		}
-
-		scrollUpIntervalId = setInterval(scrollUp, 100);
-	}
-
-	function stopScrollUp() {
-		if (scrollUpIntervalId) {
-			clearInterval(scrollUpIntervalId);
-			scrollUpIntervalId = null;
-		}
 	}
 
 	const modalStore = getModalStore();
@@ -188,6 +152,11 @@
 		};
 
 		updateData();
+		window.addEventListener('wheel', handleScroll);
+
+		return () => {
+			window.removeEventListener('wheel', handleScroll);
+		};
 	});
 
 	$: filteredProjects =
@@ -196,18 +165,6 @@
 
 {#if $selectedCompany !== 0}
 	{#if $selectedProject === 0}
-		<button
-			type="button"
-			class="btn variant-filled scroll-up-btn"
-			on:pointerover={startScrollUp}
-			on:pointerleave={stopScrollUp}>^</button
-		>
-		<button
-			type="button"
-			class="btn variant-filled scroll-down-btn"
-			on:pointerover={startScrollDown}
-			on:pointerleave={stopScrollDown}>v</button
-		>
 		<button type="button" class="btn variant-filled add-project-btn" on:click={onAddProjectClicked}>
 			<i class="fa-solid fa-plus" />
 			<span>Add Project</span>
@@ -242,23 +199,42 @@
 			{onProjectClicked}
 		/>
 	{/each}
+	{#if $rootX === 0}
+		<Graphics
+			x={$rootX + Math.cos($scrollAngle + (Math.PI * 1) / 3) * 150}
+			y={$rootY + Math.sin($scrollAngle + (Math.PI * 1) / 3) * 150}
+			draw={(graphics) => {
+				graphics.clear();
+				-graphics.beginFill(spotColor);
+				graphics.drawCircle(0, 0, 20);
+				graphics.endFill();
+			}}
+		/>
+		<Graphics
+			x={$rootX + Math.cos($scrollAngle + (Math.PI * 3) / 3) * 150}
+			y={$rootY + Math.sin($scrollAngle + (Math.PI * 3) / 3) * 150}
+			draw={(graphics) => {
+				graphics.clear();
+				graphics.beginFill(spotColor);
+				graphics.drawCircle(0, 0, 20);
+				graphics.endFill();
+			}}
+		/>
+
+		<Graphics
+			x={$rootX + Math.cos($scrollAngle + (Math.PI * 5) / 3) * 150}
+			y={$rootY + Math.sin($scrollAngle + (Math.PI * 5) / 3) * 150}
+			draw={(graphics) => {
+				graphics.clear();
+				graphics.beginFill(spotColor);
+				graphics.drawCircle(0, 0, 20);
+				graphics.endFill();
+			}}
+		/>
+	{/if}
 {/if}
 
 <style>
-	.scroll-up-btn {
-		position: absolute;
-		z-index: 10;
-		top: 10px;
-		left: 50%;
-	}
-
-	.scroll-down-btn {
-		position: absolute;
-		z-index: 10;
-		bottom: 10px;
-		left: 50%;
-	}
-
 	.add-project-btn {
 		position: absolute;
 		z-index: 10;
