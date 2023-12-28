@@ -1,0 +1,66 @@
+trigger:
+  branches:
+    include:
+      - master
+  paths:
+    include:
+      - "frontend-app/**"
+      - 'docker-compose.yml'
+      - 'docker-compose-local.yml'
+
+pr:
+  paths:
+    include:
+      - "frontend-app/**"
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  pnpm_config_cache: $(Pipeline.Workspace)/.pnpm-store
+
+steps:
+  - task: Cache@2
+    inputs:
+      key: 'pnpm | "$(Agent.OS)" | frontend-app/pnpm-lock.yaml'
+      path: $(pnpm_config_cache)
+    displayName: Cache pnpm
+
+  - script: |
+      corepack enable
+      corepack prepare pnpm@latest-8 --activate
+      pnpm config set store-dir $(pnpm_config_cache)
+    displayName: "Setup pnpm"
+
+  - script: |
+      cd frontend-app/
+      pnpm install
+      pnpm run build
+    displayName: "pnpm install and build"
+
+  - script: |
+      cd frontend-app/
+      npx playwright install
+    displayName: "Install playwright"
+
+  - script: |
+      cd frontend-app/
+      pnpm run test:unit
+    displayName: "Run Unit Tests"
+
+  - script: |
+      cd frontend-app/
+      pnpm run test:e2e
+    displayName: "Run E2E Tests"
+
+  - task: SnykSecurityScan@1
+    displayName: 'Snyk Security Scan'
+    inputs:
+      serviceConnectionEndpoint: 'Snyk'
+      testType: 'app'
+      targetFile: 'frontend-app/package.json'
+      severityThreshold: 'high'
+      monitorWhen: 'always'
+      failOnIssues: true
+      projectName: 'Frontend App'
+      organization: 'bd187a54-4038-4785-bd50-557c98a89868'
