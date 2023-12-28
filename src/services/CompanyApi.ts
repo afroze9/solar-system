@@ -72,7 +72,7 @@ async function createCompany(company: CompanyRequest): Promise<CompanyResponse |
 		if (isAxiosError(e)) {
 			return {
 				message: ((e as AxiosError).response?.data as any).message ?? e.message
-			}
+			};
 		}
 		return {
 			message: (e as any).toString()

@@ -14,7 +14,6 @@ spec:
     app: frontend-app
 
 ---
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -31,12 +30,12 @@ spec:
     rollingUpdate:
       partition: 0
     type: RollingUpdate
-  
+
   template:
     metadata:
       labels:
         app: frontend-app
-    
+
     spec:
       terminationGracePeriodSeconds: 10
       securityContext:
@@ -59,11 +58,11 @@ spec:
             - name: ConsulKV__Url
               value: http://consul.nexus.svc.cluster.local:8500
             - name: ConsulKV__AddGlobalConfig
-              value: "true"
+              value: 'true'
             - name: ConsulKV__GlobalConfigKey
-              value: "nexus-service/app-config"
+              value: 'nexus-service/app-config'
             - name: ConsulKV__Key
-              value: "company-api/app-config"
+              value: 'company-api/app-config'
             - name: ConsulKV__Token
               valueFrom:
                 secretKeyRef:
